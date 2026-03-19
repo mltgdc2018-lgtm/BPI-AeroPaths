@@ -1,0 +1,32 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3500 2000" width="3500" height="2000">
+	<style>
+		.s0 { fill: #f9dfc0 } 
+		.s1 { fill: #b76450 } 
+		.s2 { fill: #e79054 } 
+		.s3 { fill: #f0b45e } 
+		.s4 { fill: #53beb6 } 
+	</style>
+	<g id="_Artboards_">
+	</g>
+	<g id="Layer 1">
+		<path id="&lt;Path&gt;" class="s0" d="m3500 2000h-3500v-2000h3500z"/>
+		<g id="&lt;Group&gt;">
+			<path id="&lt;Path&gt;" class="s1" d="m1500 1500h-100v-1000h100z"/>
+			<path id="&lt;Path&gt;" class="s2" d="m1700 1500h-100v-1000h100z"/>
+			<path id="&lt;Path&gt;" class="s3" d="m1900 1500h-100v-1000h100z"/>
+			<path id="&lt;Path&gt;" class="s4" d="m2100 1500h-100v-1000h100z"/>
+		</g>
+		<g id="&lt;Group&gt;">
+			<path id="&lt;Path&gt;" class="s1" d="m600 2000h-600l1400-500h100z"/>
+			<path id="&lt;Path&gt;" class="s2" d="m1566.67 2000h-600l633.33-500h100z"/>
+			<path id="&lt;Path&gt;" class="s3" d="m2533.33 2000h-600l-133.33-500h100z"/>
+			<path id="&lt;Path&gt;" class="s4" d="m3500 2000h-600l-900-500h100z"/>
+		</g>
+		<g id="&lt;Group&gt;">
+			<path id="&lt;Path&gt;" class="s1" d="m600 0h-600l1400 500h100z"/>
+			<path id="&lt;Path&gt;" class="s2" d="m1566.67 0h-600l633.33 500h100z"/>
+			<path id="&lt;Path&gt;" class="s3" d="m2533.33 0h-600l-133.33 500h100z"/>
+			<path id="&lt;Path&gt;" class="s4" d="m3500 0h-600l-900 500h100z"/>
+		</g>
+	</g>
+</svg>

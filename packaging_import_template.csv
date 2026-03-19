@@ -1,0 +1,4 @@
+SKU,ProductName,Width_cm,Length_cm,Height_cm,Weight_kg,QtyPerBox,BoxID
+INV-2026-001,Inverter Hybrid 5kW,45,38,20,18.5,1,BX-L-01
+INV-2026-002,Inverter String 3kW,35,30,15,12.0,2,BX-M-04
+INV-2026-003,Micro Inverter 800W,25,18,8,3.2,4,BX-S-10

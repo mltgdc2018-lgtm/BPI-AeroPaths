@@ -1,0 +1,25 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3500 2000" width="3500" height="2000">
+	<style>
+		.s0 { fill: #523421 } 
+		.s1 { fill: #fbe5b9 } 
+		.s2 { fill: #df715b } 
+		.s3 { fill: #f8aa5c } 
+		.s4 { fill: #93c4c6 } 
+	</style>
+	<g id="_Artboards_">
+	</g>
+	<g id="Layer 1">
+		<g id="&lt;Group&gt;">
+			<path id="&lt;Path&gt;" class="s0" d="m3500 2000h-3500v-800h3500z"/>
+			<path id="&lt;Path&gt;" class="s1" d="m3500 0h-3500v1200h3500z"/>
+			<g id="&lt;Group&gt;">
+				<path id="&lt;Path&gt;" class="s2" d="m1600 1200h-100v-1200h100z"/>
+				<path id="&lt;Path&gt;" class="s3" d="m1800 1200h-100v-1200h100z"/>
+				<path id="&lt;Path&gt;" class="s4" d="m2000 1200h-100v-1200h100z"/>
+			</g>
+			<path id="&lt;Path&gt;" class="s2" d="m800 2000h-800l1500-800h100z"/>
+			<path id="&lt;Path&gt;" class="s3" d="m2150 2000h-800l350-800h100z"/>
+			<path id="&lt;Path&gt;" class="s4" d="m3500 2000h-800l-800-800h100z"/>
+		</g>
+	</g>
+</svg>
