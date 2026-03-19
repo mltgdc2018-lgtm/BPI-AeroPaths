@@ -152,6 +152,8 @@ function FlagIcon({ code, className = "h-6 w-8" }: { code: FlagCode; className?:
 
 function WeatherWidget() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<string>("");
+  const [source, setSource] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -161,6 +163,10 @@ function WeatherWidget() {
         const res = await fetch(`/api/weather${query}`);
         const data = await res.json();
         setWeather(data);
+        if (data.fetched_at || data.cached_date) {
+            setLastUpdated(data.fetched_at || data.cached_date);
+        }
+        setSource(data.source || "");
       } catch (err) {
         console.error("Failed to load weather", err);
       } finally {
@@ -260,18 +266,31 @@ function WeatherWidget() {
       <div className="flex justify-between items-start relative z-10">
         <div>
           <h3 className="text-[#7E5C4A] text-sm font-medium uppercase tracking-wider">{data.city}</h3>
-          <p className="text-xs text-[#D4AA7D] mt-1 capitalize">{data.description}</p>
+          <p className="text-xs text-[#D4AA7D] mt-1 capitalize">
+            {data.description}
+            {source && (
+                 <span className="ml-2 opacity-50 text-[10px]">
+                    ({source.includes('cache') ? 'Cached' : 'Live'})
+                 </span>
+            )}
+          </p>
         </div>
         <div className="-mt-1 -mr-1 opacity-80 scale-90">{getWeatherIcon(data.icon_code)}</div>
       </div>
 
       <div className="mt-6 relative z-10 flex items-end justify-between gap-4">
-        <div className="flex gap-3 text-xs text-[#7E5C4A] font-medium">
-          <span>H: {data.high}°</span>
-          <span>L: {data.low}°</span>
-          <span>Humidity: {data.humidity}%</span>
+        <div className="flex flex-col items-end">
+          <div className="flex gap-3 text-[10px] text-[#7E5C4A] font-medium mb-1 opacity-70">
+            <span>H: {data.high}°</span>
+            <span>L: {data.low}°</span>
+          </div>
+          <h2 className="text-4xl font-bold text-[#272727] text-right leading-none">{data.temp}°C</h2>
+          {lastUpdated && (
+            <span className="text-[9px] text-[#7E5C4A] opacity-40 mt-1">
+              Updated: {new Date(lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          )}
         </div>
-        <h2 className="text-4xl font-bold text-[#272727] text-right">{data.temp}°C</h2>
       </div>
     </GlassCard>
   );
@@ -279,6 +298,7 @@ function WeatherWidget() {
 
 function OilPriceWidget() {
   const [prices, setPrices] = useState<OilPrice[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -287,20 +307,25 @@ function OilPriceWidget() {
         const res = await fetch("/api/oil-price");
         const json = await res.json();
         const data = json.data || json;
+        
+        if (json.fetched_at || json.cached_date) {
+            setLastUpdated(json.fetched_at || json.cached_date);
+        }
 
-        if (Array.isArray(data) && data.length > 0 && data[0].OilList) {
-          const oilListStr = data[0].OilList;
-          const oilList = typeof oilListStr === "string" ? JSON.parse(oilListStr) : oilListStr;
-          const allFuels: OilPrice[] = (oilList as { OilName?: string; PriceToday?: number; PriceYesterday?: number }[])
-            .filter((item) => item?.OilName && typeof item.OilName === "string")
-            .map((item) => {
-              const priceToday = item.PriceToday || 0;
-              const priceYesterday = typeof item.PriceYesterday === "number" ? item.PriceYesterday : null;
-              const change = priceYesterday === null ? 0 : priceToday - priceYesterday;
+        if (json.success !== false) {
+          // The API returns { data: [...] } or just [...]
+          const fuelData = Array.isArray(data) ? data : (data.OilList ? JSON.parse(data.OilList) : []);
+          
+          const allFuels: OilPrice[] = fuelData
+            .filter((item: any) => item?.OilName)
+            .map((item: any) => {
+              const priceToday = parseFloat(item.PriceToday) || 0;
+              const priceYesterday = item.PriceYesterday ? parseFloat(item.PriceYesterday) : priceToday;
+              const change = priceToday - priceYesterday;
               const trend: OilPrice["trend"] = change > 0 ? "up" : change < 0 ? "down" : "flat";
 
               return {
-                OilName: item.OilName!,
+                OilName: item.OilName,
                 PriceToday: priceToday,
                 PriceYesterday: priceYesterday,
                 change,
@@ -327,6 +352,11 @@ function OilPriceWidget() {
         <div className="flex items-center gap-1.5 text-[#7E5C4A]">
           <Droplet className="w-3.5 h-3.5" />
           <span className="text-xs font-semibold tracking-wider uppercase">Oil Prices</span>
+          {lastUpdated && (
+            <span className="text-[9px] opacity-60 ml-auto">
+              {new Date(lastUpdated).toLocaleDateString()}
+            </span>
+          )}
         </div>
       </div>
 
@@ -359,6 +389,7 @@ function OilPriceWidget() {
 
 function CurrencyWidget() {
   const [rates, setRates] = useState<ExchangeRate[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -367,6 +398,11 @@ function CurrencyWidget() {
         const res = await fetch("/api/exchange-rates");
         const json = await res.json();
         const data = json.data || [];
+        
+        if (json.last_updated) {
+            setLastUpdated(json.last_updated);
+        }
+
         const filtered = data.filter((item: ExchangeRate) => TARGET_CURRENCIES.includes(item.currency_id));
         setRates(filtered);
       } catch (err) {
@@ -387,6 +423,11 @@ function CurrencyWidget() {
         <div className="flex items-center gap-1.5 text-[#7E5C4A]">
           <Coins className="w-3.5 h-3.5" />
           <span className="text-xs font-semibold tracking-wider uppercase">Exchange Rates</span>
+          {lastUpdated && (
+            <span className="text-[9px] opacity-60 ml-auto">
+              Updated: {lastUpdated}
+            </span>
+          )}
         </div>
       </div>
 

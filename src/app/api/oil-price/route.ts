@@ -10,39 +10,40 @@ export async function GET() {
     const now = new Date();
     // Helper to format date as YYYY-MM-DD in local time (Bangkok)
     const getBangkokDate = (date: Date) => {
-      return new Date(date.toLocaleString("en-US", { timeZone: "Asia/Bangkok" }))
-        .toISOString()
-        .split('T')[0];
+      const bkk = new Date(date.toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
+      const y = bkk.getFullYear();
+      const m = String(bkk.getMonth() + 1).padStart(2, '0');
+      const d = String(bkk.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
     };
 
     const todayDate = getBangkokDate(now);
     
-    // Check current time in Bangkok
-    const bangkokTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
-    const currentHour = bangkokTime.getHours();
-
     const CACHE_KEY = "oil_prices";
     const cached = await cacheService.get(CACHE_KEY);
 
-    // Rule: Update after 06:00 AM daily
-    const shouldFetchFresh = currentHour >= 6 && cached?.dateKey !== todayDate;
+    // If cache exists and is fresh (from today's 06:00 AM fetch), return it
+    if (cached && cached.dateKey === todayDate) {
+      // Ensure updatedAt is serialized correctly
+      const lastUpdated = cached.updatedAt?.toMillis 
+        ? new Date(cached.updatedAt.toMillis()).toISOString() 
+        : new Date().toISOString();
 
-    if (!shouldFetchFresh && cached) {
-      // Return cached data if it exists and we don't need to refresh yet
       return NextResponse.json({
         data: cached.data,
         source: 'cache',
-        cached_date: cached.dateKey
+        cached_date: cached.dateKey,
+        fetched_at: lastUpdated
       });
     }
 
-    // Fetch Fresh Data
+    // fallback: if cache is missing or old, try direct fetch
     const response = await fetch("https://oil-price.bangchak.co.th/ApiOilPrice2/th", {
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
         "Accept": "application/json",
       },
-      next: { revalidate: 0 }, // No internal Next.js cache, rely on our logic
+      cache: "no-store",
     });
 
     if (!response.ok) {
@@ -51,11 +52,11 @@ export async function GET() {
 
     const data = await response.json();
     
-    // Save to Cache
-    await cacheService.set(CACHE_KEY, data, todayDate);
+    // Save to Cache (Safety sync)
+    await cacheService.set(CACHE_KEY, data, todayDate, 'latest');
 
     return NextResponse.json({
-      data: data, // Keep the array intact under 'data' key
+      data: data,
       source: 'api',
       fetched_at: new Date().toISOString()
     });

@@ -45,7 +45,7 @@ function deg2rad(deg: number): number {
 }
 
 export async function GET(request: Request) {
-  const API_KEY = "a8abc0155da4f214b313e030e0419c0b";
+  const API_KEY = process.env.WEATHER_API_KEY || "a8abc0155da4f214b313e030e0419c0b";
   const { searchParams } = new URL(request.url);
   const latParam = searchParams.get('lat');
   const lonParam = searchParams.get('lon');
@@ -61,26 +61,19 @@ export async function GET(request: Request) {
   try {
     // 1. Spatial Cache Check
     const CACHE_COLLECTION = "weather_cache";
-    // Explicitly type the getAll result
     const allCache = await cacheService.getAll<WeatherData>(CACHE_COLLECTION);
     
     let nearestCache: WeatherData | null = null;
     let minDist = Infinity;
+    const now = Date.now();
 
     Object.values(allCache || {}).forEach((entry: CacheEntry<WeatherData>) => {
         try {
-          // Check freshness (5 minutes = 300,000 ms)
-          const now = Date.now();
-          
-          // Check if updatedAt exists and has toMillis method
-          // Note: Firestore Timestamp has toMillis(). 
-          // If entry comes from JSON/REST, it might look different, but here it's from Firestore SDK.
+          // Check freshness (10 minutes = 600,000 ms)
           if (!entry?.updatedAt?.toMillis) return;
-          
           const cachedTime = entry.updatedAt.toMillis();
           
-          if (now - cachedTime < 300000) { // Valid Cache
-               // Check distance
+          if (now - cachedTime < 600000) { // Valid Cache (10 min)
                if (entry.data?.coord?.lat && entry.data?.coord?.lon) {
                    const d = calculateDistance(
                      userLat, 
@@ -88,84 +81,55 @@ export async function GET(request: Request) {
                      entry.data.coord.lat, 
                      entry.data.coord.lon
                    );
-                   if (d < 20 && d < minDist) { // 20km Threshold
+                   if (d < 15 && d < minDist) { // 15km Threshold
                        minDist = d;
                        nearestCache = entry.data;
                    }
                }
           }
         } catch (err) {
-          console.error("Cache entry error:", err);
+          console.error("Cache entry processing error:", err);
         }
     });
 
     if (nearestCache) {
-        // Explicit cast or check to satisfy TS if needed, but it should be fine
-        const safeCache = nearestCache as WeatherData;
+        // Ensure nearestCache is treated as WeatherData
+        const weather = nearestCache as WeatherData;
         return NextResponse.json({
-            ...formatWeatherData(safeCache),
+            ...formatWeatherData(weather),
             source: 'cache_spatial',
-            city: safeCache.name
+            city: weather.name
         });
     }
 
-    // 2. Fetch API (No nearby fresh cache)
+    // 2. Fetch API
     const URL = `https://api.openweathermap.org/data/2.5/weather?lat=${userLat}&lon=${userLon}&appid=${API_KEY}&units=metric`;
-    const res = await fetch(URL, { next: { revalidate: 0 } });
+    const res = await fetch(URL, { cache: "no-store" });
     
     if (!res.ok) throw new Error("Weather API Failed");
 
     const data: WeatherData = await res.json();
-    const cityName = data.name;
-
-    // Check Mapping First
-    const cleanCityName = cityName.replace("City", "").trim();
-    const mappedProvince = DISTRICT_MAPPING[cityName] || DISTRICT_MAPPING[cleanCityName];
     
-    // Determine Target Status and Cache Key
-    let isTarget = false;
-    let cacheKey = cityName;
+    // 3. Save to Firebase (Cache all successful fetches)
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Determine Cache Key: Use mapped province or city name
+    const cleanCityName = (data.name || "").replace("City", "").trim();
+    const mappedProvince = DISTRICT_MAPPING[data.name] || DISTRICT_MAPPING[cleanCityName];
+    const cacheDocId = mappedProvince || data.name || `latlon_${userLat.toFixed(1)}_${userLon.toFixed(1)}`;
 
-    if (mappedProvince) {
-        isTarget = true;
-        cacheKey = mappedProvince;
-        // Logic Update: We DO NOT overwrite data.name with Province Name.
-        // We want to show "Bang Pa-in" (Natural Name) but save it under "Phra Nakhon Si Ayutthaya" (Shared Cache).
-    } else {
-        // Fallback to original list check
-        isTarget = TARGET_PROVINCES.some(p => 
-          cityName.toLowerCase().includes(p.toLowerCase())
-        );
-        if (isTarget) {
-             cacheKey = cityName;
-        }
-    }
-
-    if (isTarget) {
-        // SAVE to Cache
-        const today = new Date().toISOString().split('T')[0];
-        
-        await cacheService.set(
-          CACHE_COLLECTION, 
-          { ...data }, // Save original data (with original name e.g. "Bang Pa-in")
-          today,    // dateKey
-          cacheKey  // docId (Group by Province e.g. "Phra Nakhon Si Ayutthaya")
-        );
-        
-        return NextResponse.json({
-            ...formatWeatherData(data),
-            source: 'api',
-            is_target: true,
-            mapped_province: mappedProvince || null
-        });
-    } else {
-        // Not in target list -> Show Real Data but DO NOT Cache
-        return NextResponse.json({
-             ...formatWeatherData(data),
-             source: 'api_nosafe',
-             is_target: false
-        });
-    }
+    await cacheService.set(
+      CACHE_COLLECTION, 
+      { ...data }, 
+      today,
+      cacheDocId
+    );
+    
+    return NextResponse.json({
+        ...formatWeatherData(data),
+        source: 'api',
+        is_cached: true
+    });
 
   } catch (error) {
     console.error("Weather Proxy Error:", error);
@@ -179,8 +143,7 @@ async function getBangkokWeather(apiKey: string, warning?: string) {
       const cache = await cacheService.get<WeatherData>("weather_cache", "Bangkok");
       const now = Date.now();
       
-      // cache is CacheEntry<WeatherData> | null
-      if (cache?.updatedAt?.toMillis && (now - cache.updatedAt.toMillis() < 300000)) {
+      if (cache?.updatedAt?.toMillis && (now - cache.updatedAt.toMillis() < 600000)) {
            return NextResponse.json({
               ...formatWeatherData(cache.data),
               source: 'cache_bangkok',
@@ -194,7 +157,7 @@ async function getBangkokWeather(apiKey: string, warning?: string) {
     // Fetch Fresh Bangkok
     try {
         const URL = `https://api.openweathermap.org/data/2.5/weather?q=Bangkok&appid=${apiKey}&units=metric`;
-        const res = await fetch(URL, { next: { revalidate: 0 } });
+        const res = await fetch(URL, { cache: "no-store" });
         
         if (!res.ok) throw new Error("Bangkok API failed");
         
