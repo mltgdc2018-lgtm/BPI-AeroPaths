@@ -64,12 +64,12 @@ export function AuthContainer({ mode, children, onToggleMode }: AuthContainerPro
                   className="transition-all duration-700 transform"
                 >
                   <h2 className="text-3xl font-black mb-3 tracking-tighter drop-shadow-sm italic uppercase">
-                    {isLogin ? "Welcome Back!" : "Join the Path"}
+                    {isLogin ? "ยินดีต้อนรับกลับ!" : "เข้าร่วมกับเรา"}
                   </h2>
                   <p className="text-[#EFD09E]/60 text-sm md:text-base font-light leading-relaxed mb-8 max-w-[280px] mx-auto drop-shadow-sm tracking-wider">
                     {isLogin 
-                      ? "Sign in to keep tracking your warehouse movements and stay synchronized." 
-                      : "Start your journey with BPI AeroPath. Real-time visibility and logistics."}
+                      ? "เข้าสู่ระบบเพื่อติดตามการเคลื่อนไหวคลังสินค้าและซิงโครไนซ์ข้อมูลของคุณ" 
+                      : "เริ่มต้นเส้นทางกับ BPI AeroPath ระบบติดตามและลอจิสติกส์แบบเรียลไทม์"}
                   </p>
                 </motion.div>
               </AnimatePresence>
@@ -79,7 +79,7 @@ export function AuthContainer({ mode, children, onToggleMode }: AuthContainerPro
               onClick={onToggleMode}
               className="px-10 py-3.5 bg-[#EFD09E]/10 hover:bg-[#EFD09E]/20 backdrop-blur-md border border-[#EFD09E]/20 rounded-2xl font-black transition-all hover:scale-105 active:scale-95 text-[10px] uppercase tracking-[0.3em] shadow-2xl text-[#9ACD32]"
             >
-              {isLogin ? "Create an Account" : "Sign In instead"}
+              {isLogin ? "สร้างบัญชีใหม่" : "เข้าสู่ระบบแทน"}
             </button>
           </div>
         </motion.div>
@@ -102,7 +102,7 @@ export function AuthContainer({ mode, children, onToggleMode }: AuthContainerPro
               href="/pending" 
               className="text-[10px] text-[#7E5C4A]/60 hover:text-[#7E5C4A] transition-colors font-medium flex items-center gap-1 group"
             >
-              Learn more about BPI AeroPath <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+              เรียนรู้เพิ่มเติมเกี่ยวกับ BPI AeroPath <span className="group-hover:translate-x-0.5 transition-transform">→</span>
             </Link>
           </div>
         </motion.div>
@@ -125,7 +125,7 @@ export function AuthContainer({ mode, children, onToggleMode }: AuthContainerPro
               href="/pending" 
               className="text-[10px] text-[#7E5C4A]/60 hover:text-[#7E5C4A] transition-colors font-medium flex items-center gap-1 group"
             >
-              Learn more about BPI AeroPath <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+              เรียนรู้เพิ่มเติมเกี่ยวกับ BPI AeroPath <span className="group-hover:translate-x-0.5 transition-transform">→</span>
             </Link>
           </div>
         </motion.div>
@@ -133,10 +133,10 @@ export function AuthContainer({ mode, children, onToggleMode }: AuthContainerPro
         {/* Mobile Toggle */}
         <div className="md:hidden p-8 text-center bg-[#EEF2F6]/50">
            <p className="text-[#7E5C4A] text-sm mb-4">
-             {isLogin ? "Don't have an account?" : "Already have an account?"}
+             {isLogin ? "ยังไม่มีบัญชี?" : "มีบัญชีอยู่แล้ว?"}
            </p>
            <button onClick={onToggleMode} className="text-[#272727] font-bold">
-             {isLogin ? "Create Account" : "Sign In"}
+             {isLogin ? "สร้างบัญชี" : "เข้าสู่ระบบ"}
            </button>
         </div>
 
