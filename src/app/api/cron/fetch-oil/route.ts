@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cacheService } from "@/lib/services/cacheService";
+import { getBangkokDate, fetchOilPrices } from "@/lib/utils/apiHelpers";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -12,29 +13,10 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Time Logic (Bangkok)
-    const now = new Date();
-    const bangkokTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
-    
-    const year = bangkokTime.getFullYear();
-    const month = String(bangkokTime.getMonth() + 1).padStart(2, '0');
-    const day = String(bangkokTime.getDate()).padStart(2, '0');
-    const todayDate = `${year}-${month}-${day}`;
+    const todayDate = getBangkokDate();
 
     // --- OIL PRICE FETCH ---
-    const response = await fetch("https://oil-price.bangchak.co.th/ApiOilPrice2/th", {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-        "Accept": "application/json",
-      },
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch oil prices: ${response.statusText}`);
-    }
-
-    const data = await response.json();
+    const data = await fetchOilPrices();
     
     // Save to Firestore (Latest & Daily History)
     await cacheService.set("oil_prices", data, todayDate, 'latest');

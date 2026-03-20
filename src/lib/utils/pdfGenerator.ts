@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { PackingPlanResult } from '@/lib/services/packingLogic';
+import { PackingPlanResult } from '@/lib/services/packing-logic/packing.types';
 
 // Re-defining types to match page.tsx for independence/portability
 interface PackingRule {

@@ -18,7 +18,7 @@ import { DataTable, Column } from "@/components/shared/DataTable";
 import { Modal } from "@/components/shared/Modal";
 import { SearchToolbar } from "@/components/shared/SearchToolbar";
 import { ModuleHeader } from "@/components/projects/material-control/ModuleHeader";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/cn";
 import { PackagingService, PackagingProductDTO, IActivityChange } from "@/lib/firebase/services/packaging.service";
 import { generatePackagingSpecPDF } from "@/lib/utils/pdfGenerator";
 

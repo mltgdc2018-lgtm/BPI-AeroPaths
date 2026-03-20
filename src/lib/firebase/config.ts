@@ -14,11 +14,27 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+// --- Resilient Initialization ---
+// Check if we have minimum required config
+const isConfigValid = !!firebaseConfig.apiKey && !!firebaseConfig.projectId;
+const isBuildTime = process.env.NODE_ENV === 'production';
+
+let app;
+try {
+  if (!isConfigValid && isBuildTime) {
+    // During build, if keys are missing, we use a dummy app to prevent crash
+    app = getApps().length > 0 ? getApp() : initializeApp({ ...firebaseConfig, apiKey: "BUILD_DUMMY_KEY" });
+  } else {
+    app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+  }
+} catch (error) {
+  console.error("Firebase Initialization Error:", error);
+  app = getApps().length > 0 ? getApp() : ({} as any);
+}
+
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
-const functions = getFunctions(app, "asia-southeast1"); // standard region for Thailand applications
+const functions = getFunctions(app, "asia-southeast1");
 
 export { app, auth, db, storage, functions };
