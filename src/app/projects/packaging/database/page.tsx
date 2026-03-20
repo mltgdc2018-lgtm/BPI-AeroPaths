@@ -1,6 +1,6 @@
 "use client";
 
-import { Database, Archive, PackageCheck } from "lucide-react";
+import { Database } from "lucide-react";
 import { GlassCard } from "@/components/shared/GlassCard";
 
 export default function PackagingDatabasePage() {

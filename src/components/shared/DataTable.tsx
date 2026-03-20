@@ -26,7 +26,7 @@ export interface Column<T> {
   header: string;
   align?: "left" | "center" | "right";
   type?: "text" | "date" | "badge";
-  render?: (value: any, row: T) => React.ReactNode;
+  render?: (value: unknown, row: T) => React.ReactNode;
   className?: string;
 }
 

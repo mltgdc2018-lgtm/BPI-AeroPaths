@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs');
-const path = require('path');
 
 // Helper to parse CSV line strictly (handling commas in quotes if any, though likely not needed for this simple data)
 // Simple split by comma is enough if no quoted commas. 

@@ -26,7 +26,7 @@ import { ActivityService } from './activity.service';
 export interface QueryFilter {
   field: string;
   operator: WhereFilterOp;
-  value: any;
+  value: unknown;
 }
 
 export interface QueryOrder {
@@ -71,9 +71,9 @@ export const FirestoreService = {
       }
 
       return { id: docRef.id, error: null };
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       console.error('Firestore Create Error:', error);
-      return { id: '', error };
+      return { id: '', error: error as Error };
     }
   },
 
@@ -90,9 +90,9 @@ export const FirestoreService = {
         return { data: { id: docSnap.id, ...docSnap.data() } as T, error: null };
       }
       return { data: null, error: null };
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       console.error('Firestore GetById Error:', error);
-      return { data: null, error };
+      return { data: null, error: error as Error };
     }
   },
 
@@ -127,9 +127,9 @@ export const FirestoreService = {
       });
 
       return { data, error: null };
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       console.error('Firestore GetAll Error:', error);
-      return { data: [], error };
+      return { data: [], error: error as Error };
     }
   },
 
@@ -164,9 +164,9 @@ export const FirestoreService = {
       }
 
       return { success: true, error: null };
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       console.error('Firestore Update Error:', error);
-      return { success: false, error };
+      return { success: false, error: error as Error };
     }
   },
 
@@ -193,9 +193,9 @@ export const FirestoreService = {
       }
 
       return { success: true, error: null };
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       console.error('Firestore Delete Error:', error);
-      return { success: false, error };
+      return { success: false, error: error as Error };
     }
   },
 };
@@ -216,7 +216,7 @@ function getModuleFromCollection(collectionName: string): string {
   return mapping[collectionName] || collectionName;
 }
 
-function computeChanges(original: any, updated: any): { field: string; before: string; after: string }[] {
+function computeChanges(original: Record<string, unknown>, updated: Record<string, unknown>): { field: string; before: string; after: string }[] {
   const changes: { field: string; before: string; after: string }[] = [];
   
   Object.keys(updated).forEach((key) => {

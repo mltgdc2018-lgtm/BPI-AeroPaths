@@ -87,10 +87,10 @@ export default function ActivityPage() {
       header: "Module", 
       align: "center",
       render: (val) => {
-        const module = typeof val === "string" ? val : String(val ?? "-");
+        const moduleName = typeof val === "string" ? val : String(val ?? "-");
         return (
           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#EFD09E]/70 text-[#272727] border border-[#D4AA7D]/35">
-            {module}
+            {moduleName}
           </span>
         );
       }

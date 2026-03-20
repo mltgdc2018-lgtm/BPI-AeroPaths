@@ -49,7 +49,7 @@ export default function InventoryPage() {
       align: "center",
       render: (val) => (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#EFD09E]/70 text-[#272727] border border-[#D4AA7D]/40">
-          {val}
+          {val as React.ReactNode}
         </span>
       )
     },

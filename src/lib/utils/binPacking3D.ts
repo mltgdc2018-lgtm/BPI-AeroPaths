@@ -416,7 +416,7 @@ export function validatePacking(
 // EXPORT DEFAULT
 // ============================================================================
 
-export default {
+const binPacking3DApi = {
   pack3D,
   validatePacking,
   simplePhysicalCheck,
@@ -427,3 +427,5 @@ export default {
   formatDimensions,
   printPackingResult
 };
+
+export default binPacking3DApi;

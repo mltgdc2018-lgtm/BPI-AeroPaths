@@ -57,7 +57,7 @@ export default function RequisitionPage() {
       align: "center",
       render: (val) => (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#EFD09E]/70 text-[#272727] border border-[#D4AA7D]/35">
-          {val}
+          {val as React.ReactNode}
         </span>
       )
     },
@@ -70,7 +70,7 @@ export default function RequisitionPage() {
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
           val === "High" ? "bg-red-50 text-red-700 border border-red-100" : "bg-blue-50 text-blue-700 border border-blue-100"
         }`}>
-          {val}
+          {val as React.ReactNode}
         </span>
       )
     },
@@ -79,6 +79,7 @@ export default function RequisitionPage() {
       header: "Status", 
       align: "center",
       render: (val) => {
+        const strVal = String(val);
         const styles: Record<string, string> = {
           Pending: "bg-[#EFD09E]/60 text-[#7E5C4A] border-[#D4AA7D]/35",
           Approved: "bg-[#9ACD32]/20 text-[#5a7a1a] border-[#9ACD32]/35",
@@ -86,8 +87,8 @@ export default function RequisitionPage() {
           Rejected: "bg-rose-50 text-rose-700 border-rose-100",
         };
         return (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles[val] || ""}`}>
-            {val}
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles[strVal] || ""}`}>
+            {strVal}
           </span>
         );
       }

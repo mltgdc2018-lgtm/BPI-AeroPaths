@@ -48,6 +48,7 @@ export default function SettingsPage() {
       header: "Type", 
       align: "center",
       render: (val) => {
+        const strVal = String(val);
         const icons: Record<string, React.ReactNode> = {
           Category: <Tag className="w-3 h-3" />,
           Location: <MapPin className="w-3 h-3" />,
@@ -56,7 +57,7 @@ export default function SettingsPage() {
         };
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#EFD09E]/70 text-[#272727] border border-[#D4AA7D]/35">
-            {icons[val]} {val}
+            {icons[strVal]} {strVal}
           </span>
         );
       }
@@ -67,13 +68,16 @@ export default function SettingsPage() {
       key: "status", 
       header: "Status", 
       align: "center",
-      render: (val) => (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-          val === "Active" ? "bg-[#9ACD32]/20 text-[#5a7a1a] border-[#9ACD32]/35" : "bg-[#EEF2F6] text-[#7E5C4A] border-[#D4AA7D]/30"
-        }`}>
-          {val}
-        </span>
-      )
+      render: (val) => {
+        const strVal = String(val);
+        return (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+            strVal === "Active" ? "bg-[#9ACD32]/20 text-[#5a7a1a] border-[#9ACD32]/35" : "bg-[#EEF2F6] text-[#7E5C4A] border-[#D4AA7D]/30"
+          }`}>
+            {strVal}
+          </span>
+        );
+      }
     },
   ];
 

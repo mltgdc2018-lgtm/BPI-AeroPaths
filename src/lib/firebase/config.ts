@@ -29,6 +29,7 @@ try {
   }
 } catch (error) {
   console.error("Firebase Initialization Error:", error);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   app = getApps().length > 0 ? getApp() : ({} as any);
 }
 

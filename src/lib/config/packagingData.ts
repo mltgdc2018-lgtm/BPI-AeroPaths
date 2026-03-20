@@ -237,7 +237,7 @@ export function findLargestPackage(
 export function validatePackageData(): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
   
-  PACKAGE_MASTER_DATA.forEach((pkg, idx) => {
+  PACKAGE_MASTER_DATA.forEach((pkg) => {
     // Check m3 calculation (Approx check)
     const calculatedM3 = calculateM3(pkg.inner);
     const diff = Math.abs(calculatedM3 - pkg.m3);
@@ -265,7 +265,7 @@ export function validatePackageData(): { valid: boolean; errors: string[] } {
 // EXPORT DEFAULT
 // ============================================================================
 
-export default {
+const packagingMasterDataApi = {
   PACKAGE_MASTER_DATA,
   CUSTOMER_PACK_TYPE_MAPPING,
   getRegionByType,
@@ -277,3 +277,5 @@ export default {
   findLargestPackage,
   validatePackageData
 };
+
+export default packagingMasterDataApi;

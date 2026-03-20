@@ -65,7 +65,7 @@ export default function ReportsPage() {
       align: "center",
       render: (val) => (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#EFD09E]/70 text-[#272727] border border-[#D4AA7D]/35">
-          {val}
+          {val as React.ReactNode}
         </span>
       )
     },
@@ -76,14 +76,15 @@ export default function ReportsPage() {
       header: "Status", 
       align: "center",
       render: (val) => {
+        const strVal = String(val);
         const styles: Record<string, string> = {
           Ready: "bg-[#9ACD32]/20 text-[#5a7a1a] border-[#9ACD32]/35",
           Generating: "bg-[#EEF2F6] text-[#7E5C4A] border-[#D4AA7D]/30 animate-pulse",
           Scheduled: "bg-[#EFD09E]/60 text-[#7E5C4A] border-[#D4AA7D]/35",
         };
         return (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles[val] || ""}`}>
-            {val}
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles[strVal] || ""}`}>
+            {strVal}
           </span>
         );
       }

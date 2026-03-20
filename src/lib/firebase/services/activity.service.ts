@@ -55,9 +55,9 @@ export const ActivityService = {
         timestamp: serverTimestamp(),
       });
       return { success: true, error: null };
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       console.error('Activity Log Error:', error);
-      return { success: false, error };
+      return { success: false, error: error as Error };
     }
   },
 
@@ -83,9 +83,9 @@ export const ActivityService = {
       });
 
       return { data, error: null };
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       console.error('Get Activities Error:', error);
-      return { data: [], error };
+      return { data: [], error: error as Error };
     }
   },
 
@@ -112,9 +112,9 @@ export const ActivityService = {
       });
 
       return { data, error: null };
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       console.error('Get Activities by Module Error:', error);
-      return { data: [], error };
+      return { data: [], error: error as Error };
     }
   },
 
@@ -146,9 +146,9 @@ export const ActivityService = {
       });
 
       return { data, error: null };
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       console.error('Get Activities by Date Range Error:', error);
-      return { data: [], error };
+      return { data: [], error: error as Error };
     }
   },
 };

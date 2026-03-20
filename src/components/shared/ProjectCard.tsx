@@ -28,7 +28,6 @@ export function ProjectCard({
   icon: Icon,
   href,
   status,
-  iconColor = "from-[#9ACD32] to-[#84B62B]",
   tone = "creamy",
 }: ProjectCardProps) {
   const statusMap = {

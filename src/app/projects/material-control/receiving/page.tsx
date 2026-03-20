@@ -8,7 +8,7 @@ import { SearchToolbar } from "@/components/shared/SearchToolbar";
 import { DataTable, Column } from "@/components/shared/DataTable";
 import { DateInput } from "@/components/shared/DateInput";
 import { SelectField } from "@/components/shared/SelectField";
-import { Package, Truck, CheckCircle2, Clock, Plus } from "lucide-react";
+import { Truck, CheckCircle2, Clock, Plus } from "lucide-react";
 import { formatDate } from "@/lib/utils/formatters";
 
 // Types
@@ -61,9 +61,10 @@ export default function ReceivingPage() {
           Verified: "bg-[#EEF2F6] text-[#7E5C4A] border-[#D4AA7D]/30",
           Completed: "bg-[#9ACD32]/20 text-[#5a7a1a] border-[#9ACD32]/35",
         };
+        const stringVal = String(val);
         return (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles[val] || ""}`}>
-            {val}
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles[stringVal] || ""}`}>
+            {stringVal}
           </span>
         );
       }

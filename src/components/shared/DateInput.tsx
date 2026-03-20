@@ -31,7 +31,6 @@ export function DateInput({
   value = "",
   onChange,
   label,
-  placeholder = "Select date...",
   disabled = false,
   className,
 }: DateInputProps) {

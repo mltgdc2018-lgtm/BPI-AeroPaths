@@ -591,7 +591,7 @@ export default function CategoryDetailPage() {
           <div className="w-8 h-8 rounded-lg bg-[#272727]/10 flex items-center justify-center text-[#272727] group-hover:bg-[#EFD09E]/15 group-hover:text-[#EFD09E]">
             <Zap className="w-4 h-4" />
           </div>
-          <div className="font-bold text-[#272727] group-hover:text-[#EFD09E]">{val}</div>
+          <div className="font-bold text-[#272727] group-hover:text-[#EFD09E]">{val as React.ReactNode}</div>
         </div>
       )
     },
@@ -611,19 +611,19 @@ export default function CategoryDetailPage() {
       key: "nw", 
       header: "Net Weight (kg)", 
       align: "center",
-      render: (val) => <span className="font-bold text-[#272727] group-hover:text-[#EFD09E]">{val}</span>
+      render: (val) => <span className="font-bold text-[#272727] group-hover:text-[#EFD09E]">{val as React.ReactNode}</span>
     },
     { 
       key: "gw", 
       header: "Gross Weight (kg)", 
       align: "center",
-      render: (val) => <span className="font-bold text-[#272727] group-hover:text-[#EFD09E]">{val}</span>
+      render: (val) => <span className="font-bold text-[#272727] group-hover:text-[#EFD09E]">{val as React.ReactNode}</span>
     },
     {
       key: "cbm",
       header: "CBM",
       align: "center",
-      render: (val) => <span className="font-bold text-[#7E5C4A] group-hover:text-[#EFD09E]">{val}</span>
+      render: (val) => <span className="font-bold text-[#7E5C4A] group-hover:text-[#EFD09E]">{val as React.ReactNode}</span>
     },
     { key: "productType", header: "Product Type", align: "center", className: "whitespace-nowrap", render: (val) => (
         <span className={cn(
@@ -632,7 +632,7 @@ export default function CategoryDetailPage() {
           val === "Carton Case" ? "bg-[#EEF2F6] text-[#272727] border border-[#D4AA7D]/45" :
           "bg-[#D4AA7D]/55 text-[#7E5C4A] border border-[#D4AA7D]/45 group-hover:text-white" 
         )}>
-          {val}
+          {val as React.ReactNode}
         </span>
       )
     },
@@ -640,7 +640,7 @@ export default function CategoryDetailPage() {
       key: "stackingLimit",
       header: "Stack Limit",
       align: "center",
-      render: (val) => <span className="font-semibold">{val}</span>
+      render: (val) => <span className="font-semibold">{val as React.ReactNode}</span>
     },
 
     { key: "lastUpdated", header: "Last Update", align: "center", type: "date", className: "whitespace-nowrap" },
