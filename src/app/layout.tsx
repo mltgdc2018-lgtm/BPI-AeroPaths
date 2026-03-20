@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import "./(main)/globals.css";
 
 export const metadata: Metadata = {
-  title: "BPI AeroPath - Centralized Work Hub",
+  title: "BPI AeroPath - ศูนย์กลางการทำงานที่ครบวงจร",
   description:
-    "Warehouse & Logistics Management System for Material Control, Warehouse, and Delivery",
+    "ระบบจัดการคลังสินค้าและลอจิสติกส์ สำหรับการควบคุมวัสดุ คลังสินค้า และการจัดส่ง",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [
@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="th">
       <body
         className="antialiased bg-app-gradient"
         suppressHydrationWarning={true}

@@ -253,45 +253,45 @@ function mapAuthError(error: unknown): AuthError {
   console.error("Auth Debug - Code:", firebaseError.code);
   console.error("Auth Debug - Message:", firebaseError.message);
   
-  let message = "An unexpected error occurred. Please try again.";
+  let message = "เกิดข้อผิดพลาดที่ไม่คาดคิด โปรดลองใหม่อีกครั้ง";
   
   const code = firebaseError.code;
   switch (code) {
     case 'auth/invalid-email':
-      message = "Invalid email format.";
+      message = "รูปแบบอีเมลไม่ถูกต้อง";
       break;
     case 'auth/user-not-found':
-      message = "User not found.";
+      message = "ไม่พบผู้ใช้งานนี้ในระบบ";
       break;
     case 'auth/wrong-password':
-      message = "Incorrect password.";
+      message = "รหัสผ่านไม่ถูกต้อง";
       break;
     case 'auth/invalid-credential':
-      message = "Invalid email or password. Please check and try again.";
+      message = "อีเมลหรือรหัสผ่านไม่ถูกต้อง โปรดตรวจสอบอีกครั้ง";
       break;
     case 'auth/email-already-in-use':
-      message = "Email is already in use.";
+      message = "อีเมลนี้ถูกใช้งานไปแล้ว";
       break;
     case 'auth/weak-password':
-      message = "Password must be at least 6 characters.";
+      message = "รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร";
       break;
     case 'auth/popup-closed-by-user':
-      message = "Sign-in was cancelled by user.";
+      message = "การเข้าสู่ระบบถูกยกเลิกโดยผู้ใช้งาน";
       break;
     case 'auth/popup-blocked':
-      message = "Sign-in popup was blocked by your browser. Please allow popups for this site.";
+      message = "ป๊อปอัพเข้าสู่ระบบถูกบล็อกโดยเบราว์เซอร์ของคุณ โปรดอนุญาตป๊อปอัพสำหรับเว็บไซต์นี้";
       break;
     case 'auth/operation-not-allowed':
-      message = "Google Sign-In is not enabled in the Firebase project settings.";
+      message = "การเข้าสู่ระบบด้วย Google ยังไม่ถูกเปิดใช้งานในโปรเจกต์นี้";
       break;
     case 'auth/unauthorized-domain':
-      message = "This domain is not authorized for Google Sign-In. Please check Firebase console.";
+      message = "โดเมนนี้ไม่ได้รับอนุญาตให้เข้าสู่ระบบด้วย Google";
       break;
     case 'auth/too-many-requests':
-      message = "Too many failed login attempts. Please try again later.";
+      message = "มีการพยายามเข้าสู่ระบบล้มเหลวมากเกินไป โปรดลองใหม่ในภายหลัง";
       break;
     case 'auth/network-request-failed':
-      message = "Network error. Please check your connection.";
+      message = "ข้อผิดพลาดของเครือข่าย โปรดตรวจสอบการเชื่อมต่อของคุณ";
       break;
   }
   

@@ -20,18 +20,18 @@ export default function ProjectsPage() {
           <div className="text-center mb-10">
             <h1 className="text-3xl md:text-4xl font-bold mb-3">
               <span className="bg-clip-text text-transparent bg-linear-to-br from-slate-800 via-slate-600 to-slate-800 bg-size-[200%_100%] animate-shimmer drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
-                Projects
+                โครงการ / โมดูลใช้งาน
               </span>
             </h1>
             <p className="text-slate-600 text-base md:text-lg max-w-2xl mx-auto">
-              Select a module to continue.
+              เลือกโมดูลที่ต้องการเพื่อดำเนินการต่อ
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <ProjectCard
-              title="Material Control"
-              description="Manage inventory, requisitions, and receiving. Track stock levels and automate reorder points."
+              title="ระบบควบคุมวัสดุ (Material Control)"
+              description="จัดการสต็อกสินค้า, ใบเบิก และการรับของ ติดตามระดับสินค้าคงคลังและระบบแจ้งเตือนจุดสั่งซื้ออัตโนมัติ"
               icon={Package}
               href="/projects/material-control"
               status="active"
@@ -39,8 +39,8 @@ export default function ProjectsPage() {
             />
 
             <ProjectCard
-              title="Packaging Console"
-              description="Automated packaging planning and optimization system for efficient logistics and material handling."
+              title="ระบบวางแผนบรรจุภัณฑ์ (Packaging Console)"
+              description="ระบบวางแผนและเพิ่มประสิทธิภาพการบรรจุภัณฑ์อัตโนมัติ เพื่อการจัดการลอจิสติกส์และวัสดุที่รวดเร็ว"
               icon={Boxes}
               href="/projects/packaging"
               status="active"
@@ -48,8 +48,8 @@ export default function ProjectsPage() {
             />
 
             <ProjectCard
-              title="Warehouse Management"
-              description="Optimize warehouse operations with location tracking, stock movements, and space utilization."
+              title="ระบบจัดการคลังสินค้า (Warehouse)"
+              description="เพิ่มประสิทธิภาพพื้นที่คลังสินค้าด้วยการติดตามตำแหน่ง การเคลื่อนไหวของสต็อก และการใช้พื้นที่"
               icon={Warehouse}
               href="/projects/warehouse"
               status="coming-soon"
@@ -57,8 +57,8 @@ export default function ProjectsPage() {
             />
 
             <ProjectCard
-              title="Delivery Tracking"
-              description="Monitor shipments, delivery status, and logistics in real-time with automated notifications."
+              title="ระบบติดตามการจัดส่ง (Delivery)"
+              description="ตรวจสอบสถานะการขนส่ง และลอจิสติกส์แบบเรียลไทม์ พร้อมระบบแจ้งเตือนอัตโนมัติ"
               icon={Truck}
               href="/projects/delivery"
               status="coming-soon"
@@ -66,8 +66,8 @@ export default function ProjectsPage() {
             />
 
             <ProjectCard
-              title="Document Center"
-              description="Centralized repository for all documents, reports, and compliance records."
+              title="ศูนย์รวมเอกสาร (Documents)"
+              description="แหล่งรวบรวมเอกสาร รายงาน และบันทึกการปฏิบัติตามข้อกำหนดทั้งหมดขององค์กร"
               icon={FileText}
               href="/projects/documents"
               status="coming-soon"
@@ -75,8 +75,8 @@ export default function ProjectsPage() {
             />
 
             <ProjectCard
-              title="Task Management"
-              description="Assign, track, and manage team tasks with priorities and deadlines."
+              title="ระบบจัดการงาน (Tasks)"
+              description="มอบหมาย ติดตาม และจัดการงานของทีม พร้อมระบบจัดลำดับความสำคัญและกำหนดส่ง"
               icon={ListTodo}
               href="/projects/tasks"
               status="coming-soon"
@@ -84,8 +84,8 @@ export default function ProjectsPage() {
             />
 
             <ProjectCard
-              title="Analytics Dashboard"
-              description="Comprehensive reports and insights on inventory, operations, and team performance."
+              title="แดชบอร์ดสถิติ (Analytics)"
+              description="รายงานสรุปและข้อมูลเชิงลึกเกี่ยวกับคลังสินค้า การดำเนินงาน และประสิทธิภาพของทีม"
               icon={BarChart3}
               href="/projects/analytics"
               status="coming-soon"
@@ -93,8 +93,8 @@ export default function ProjectsPage() {
             />
 
             <ProjectCard
-              title="Maintenance Log"
-              description="Track equipment maintenance, repairs, and service schedules."
+              title="บันทึกการบำรุงรักษา (Maintenance)"
+              description="ติดตามการบำรุงรักษาอุปกรณ์ การซ่อมแซม และตารางการเข้ารับบริการตามระยะเวลา"
               icon={Wrench}
               href="/projects/maintenance"
               status="coming-soon"
@@ -102,8 +102,8 @@ export default function ProjectsPage() {
             />
 
             <ProjectCard
-              title="Staff Schedule"
-              description="Manage team schedules, shifts, and availability for optimal coverage."
+              title="ตารางเวลาเจ้าหน้าที่ (Staff Schedule)"
+              description="จัดการตารางเวลา การเข้ากะ และความพร้อมของทีมงานเพื่อการปฏิบัติงานที่ครอบคลุม"
               icon={Users}
               href="/projects/staff"
               status="coming-soon"

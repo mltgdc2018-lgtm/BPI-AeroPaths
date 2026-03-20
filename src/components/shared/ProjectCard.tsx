@@ -31,9 +31,9 @@ export function ProjectCard({
   tone = "creamy",
 }: ProjectCardProps) {
   const statusMap = {
-    active: { label: "Active", type: "success" as const },
-    "coming-soon": { label: "Coming Soon", type: "info" as const },
-    beta: { label: "Beta", type: "warning" as const },
+    active: { label: "พร้อมใช้งาน", type: "success" as const },
+    "coming-soon": { label: "เร็วๆ นี้", type: "info" as const },
+    beta: { label: "เบต้า", type: "warning" as const },
   };
 
   const toneMap = {

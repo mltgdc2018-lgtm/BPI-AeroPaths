@@ -239,10 +239,10 @@ const CURRENCY_FLAG_CODES: Record<string, FlagCode> = {
 };
 
 const TIME_ZONE_CITIES: Array<{ name: string; tz: string; flagCode: FlagCode }> = [
-  { name: "Bangkok", tz: "Asia/Bangkok", flagCode: "TH" },
-  { name: "Tokyo", tz: "Asia/Tokyo", flagCode: "JP" },
-  { name: "London", tz: "Europe/London", flagCode: "GB" },
-  { name: "New York", tz: "America/New_York", flagCode: "US" },
+  { name: "กรุงเทพฯ", tz: "Asia/Bangkok", flagCode: "TH" },
+  { name: "โตเกียว", tz: "Asia/Tokyo", flagCode: "JP" },
+  { name: "ลอนดอน", tz: "Europe/London", flagCode: "GB" },
+  { name: "นิวยอร์ก", tz: "America/New_York", flagCode: "US" },
 ];
 
 function FlagIcon({ code, className = "h-6 w-8" }: { code: FlagCode; className?: string }) {
@@ -381,7 +381,7 @@ function OilPriceWidget() {
         </div>
         <div className="flex items-center gap-1.5 text-[#7E5C4A]">
           <Droplet className="w-3.5 h-3.5" />
-          <span className="text-xs font-semibold tracking-wider uppercase">Oil Prices</span>
+          <span className="text-xs font-semibold tracking-wider uppercase">ราคาน้ำมัน (Oil Prices)</span>
         </div>
       </div>
       
@@ -412,13 +412,13 @@ function OilPriceWidget() {
         )}
         {prices.length === 0 && !loading && (
           <div className="text-center py-6 text-[#7E5C4A] text-sm">
-             Unable to load prices
+             ไม่สามารถโหลดข้อมูลราคาได้
           </div>
         )}
       </div>
       
       {/* Footer */}
-      <p className="text-[9px] text-[#D4AA7D] mt-3 text-center shrink-0">Updated Daily • Bangchak API</p>
+      <p className="text-[9px] text-[#D4AA7D] mt-3 text-center shrink-0">อัปเดตรายวัน • Bangchak API</p>
     </GlassCard>
   );
 }
@@ -493,7 +493,7 @@ function CurrencyWidget() {
         </div>
         <div className="flex items-center gap-1.5 text-[#7E5C4A]">
            <Coins className="w-3.5 h-3.5" />
-           <span className="text-xs font-semibold tracking-wider uppercase">Exchange Rates</span>
+           <span className="text-xs font-semibold tracking-wider uppercase">อัตราแลกเปลี่ยน (Exchange Rates)</span>
         </div>
       </div>
 
@@ -530,7 +530,7 @@ function CurrencyWidget() {
 
       {/* Footer */}
       <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-[#D4AA7D]">
-        <span className="font-medium">Bank of Thailand</span>
+        <span className="font-medium">ธนาคารแห่งประเทศไทย</span>
         {date && (
           <>
             <span className="w-1 h-1 rounded-full bg-[#D4AA7D]"></span>
@@ -572,7 +572,7 @@ function TimeZoneWidget() {
     <GlassCard className={`h-full p-6 flex flex-col relative overflow-hidden ${CLAY_CARD_BASE}`}>
       <div className="flex items-center gap-2 mb-6 pb-3 border-b border-[#D4AA7D]/30 shrink-0">
         <GlobeLock className="w-5 h-5 text-[#7E5C4A]" />
-        <span className="text-sm font-bold tracking-wider uppercase text-[#7E5C4A]">Global Time Zones</span>
+        <span className="text-sm font-bold tracking-wider uppercase text-[#7E5C4A]">โซนเวลาโลก (Time Zones)</span>
       </div>
 
       <div className="flex-1 grid grid-cols-2 gap-4">
@@ -589,7 +589,7 @@ function TimeZoneWidget() {
         ))}
       </div>
       
-      <p className="text-[9px] text-[#D4AA7D] mt-4 text-center italic">Synchronized with World Atomic Clock</p>
+      <p className="text-[9px] text-[#D4AA7D] mt-4 text-center italic">ซิงโครไนซ์กับ World Atomic Clock</p>
     </GlassCard>
   );
 }
@@ -678,7 +678,7 @@ export default function PendingPage() {
                 transition={isJoinHovered ? { duration: 0.3 } : { duration: 3, repeat: Infinity, ease: "linear" }}
                 className="relative z-10"
               >
-                Join us!!
+                เข้าร่วมกับเรา!!
               </motion.span>
               <AnimatePresence>
                 {isJoinHovered && (
@@ -710,7 +710,7 @@ export default function PendingPage() {
               <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#D4AA7D] rounded-full animate-ping"></span>
               <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#D4AA7D] rounded-full"></span>
             </div>
-            <span className="text-sm font-semibold text-[#7E5C4A] tracking-wide">ACCOUNT PENDING APPROVAL</span>
+            <span className="text-sm font-semibold text-[#7E5C4A] tracking-wide">บัญชีกำลังรอการอนุมัติ (PENDING APPROVAL)</span>
           </div>
         </div>
       )}
@@ -762,8 +762,8 @@ export default function PendingPage() {
               className="text-4xl md:text-6xl mb-10 tracking-tight leading-tight text-[#272727] animate-fade-in-up" 
               style={{ fontFamily: 'var(--font-montserrat-alt)', fontWeight: 600, fontStyle: 'italic', animationDuration: '1.5s' }}
             >
-              Consolidate Your <br />
-              <span className="lg:whitespace-nowrap text-3xl md:text-5xl text-[#7E5C4A]">Operating System Workflow</span>
+              ยกระดับเวิร์กโฟลว์ <br />
+              <span className="lg:whitespace-nowrap text-3xl md:text-5xl text-[#7E5C4A]">ระบบปฏิบัติการของคุณ</span>
             </h1>
             </ParallaxElement>
 
@@ -772,10 +772,10 @@ export default function PendingPage() {
             <div className="inline-block bg-[#EEF2F6]/90 border border-white/70 rounded-2xl px-8 py-5 shadow-[8px_8px_18px_rgba(166,180,200,0.28),-8px_-8px_18px_rgba(255,255,255,0.9)]">
               <p className="text-lg md:text-xl leading-relaxed max-w-none mx-auto text-center" style={{ fontFamily: 'var(--font-montserrat-alt)', fontWeight: 400, fontStyle: 'italic' }}>
                 <span className="block text-[#272727] animate-fade-in-up delay-150 lg:whitespace-nowrap" style={{ animationDuration: '0.4s' }}>
-                  Transform your warehouse operations into a streamlined, digital powerhouse.
+                  เปลี่ยนการดำเนินงานคลังสินค้าของคุณให้เป็นระบบดิจิทัลที่คล่องตัวและทรงพลัง
                 </span>
                 <span className="block text-[#7E5C4A] animate-fade-in-up delay-200 lg:whitespace-nowrap" style={{ animationDuration: '0.4s' }}>
-                  Real-time tracking, seamless syncing, enterprise-grade security — all in one hub.
+                   การติดตามแบบเรียลไทม์, ความปลอดภัยระดับองค์กร — ทั้งหมดในที่เดียว
                 </span>
               </p>
             </div>
@@ -839,31 +839,31 @@ export default function PendingPage() {
                 <div className="p-2 bg-[#D4AA7D]/30 rounded-xl">
                   <Newspaper className="w-8 h-8 text-[#9ACD32]" />
                 </div>
-                Latest Announcements
+                ประกาศล่าสุด (Latest Announcements)
               </h2>
-              <p className="text-[#7E5C4A] mt-2 font-medium">Stay updated with the latest news from BPI AeroPath team</p>
+              <p className="text-[#7E5C4A] mt-2 font-medium">ติดตามข่าวสารล่าสุดจากทีมงาน BPI AeroPath</p>
             </div>
-            <a href="#" className="px-6 py-2.5 bg-[#EEF2F6] text-[#7E5C4A] rounded-full text-sm font-bold border border-white/80 shadow-[6px_6px_12px_rgba(166,180,200,0.28),-6px_-6px_12px_rgba(255,255,255,0.92)] hover:-translate-y-0.5 hover:text-[#272727] transition-all active:translate-y-0 active:shadow-[inset_3px_3px_6px_rgba(166,180,200,0.25),inset_-3px_-3px_6px_rgba(255,255,255,0.9)]">View All →</a>
+            <a href="#" className="px-6 py-2.5 bg-[#EEF2F6] text-[#7E5C4A] rounded-full text-sm font-bold border border-white/80 shadow-[6px_6px_12px_rgba(166,180,200,0.28),-6px_-6px_12px_rgba(255,255,255,0.92)] hover:-translate-y-0.5 hover:text-[#272727] transition-all active:translate-y-0 active:shadow-[inset_3px_3px_6px_rgba(166,180,200,0.25),inset_-3px_-3px_6px_rgba(255,255,255,0.9)]">ดูทั้งหมด →</a>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <NewsCard 
               image="/news1.png"
-              category="System Update"
-              date="Jan 30, 2026"
-              title="Version 2.0 Release: Enhanced Material Control & Real-time Tracking"
+              category="อัปเดตระบบ"
+              date="30 ม.ค. 2026"
+              title="เปิดตัวเวอร์ชัน 2.0: เพิ่มประสิทธิภาพการควบคุมวัสดุและการติดตามแบบเรียลไทม์"
             />
             <NewsCard 
               image="/news2.png"
-              category="Maintenance"
-              date="Jan 28, 2026"
-              title="Scheduled Server Maintenance this Weekend (02:00 - 04:00 AM)"
+              category="การบำรุงรักษา"
+              date="28 ม.ค. 2026"
+              title="กำหนดการบำรุงรักษาเซิร์ฟเวอร์สุดสัปดาห์นี้ (02:00 - 04:00 น.)"
             />
             <NewsCard 
               image="/news3.png"
-              category="Security"
-              date="Jan 25, 2026"
-              title="New Multi-Factor Authentication (MFA) Features for Admin Users"
+              category="ความปลอดภัย"
+              date="25 ม.ค. 2026"
+              title="ฟีเจอร์ใหม่ Multi-Factor Authentication (MFA) สำหรับผู้ดูแลระบบ"
             />
           </div>
         </div>
@@ -881,10 +881,10 @@ export default function PendingPage() {
           {/* Intro */}
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-[#272727] mb-4">
-              Why AeroPath?
+              ทำไมต้อง AeroPath?
             </h2>
             <p className="text-xl text-[#7E5C4A] max-w-3xl mx-auto">
-              A comprehensive digital solution designed to transform warehouse logistics into a secure, real-time, and paperless operation.
+              โซลูชันดิจิทัลที่ครอบคลุม ออกแบบมาเพื่อเปลี่ยนลอจิสติกส์คลังสินค้าให้เป็นการดำเนินงานที่ปลอดภัย เรียลไทม์ และไร้กระดาษ
             </p>
           </div>
 
@@ -894,27 +894,27 @@ export default function PendingPage() {
               <div className="w-24 h-20 bg-[#F6D9E1] rounded-[1.25rem] flex items-center justify-center mx-auto mb-6 border border-white/80 shadow-[6px_6px_14px_rgba(166,180,200,0.26),-6px_-6px_14px_rgba(255,255,255,0.9)]">
                 <Warehouse className="w-10 h-10 text-[#9ACD32]" />
               </div>
-              <h3 className="text-xl font-bold text-[#272727] mb-3">Total Visibility</h3>
+              <h3 className="text-xl font-bold text-[#272727] mb-3">การมองเห็นที่สมบูรณ์</h3>
               <p className="text-[#7E5C4A] leading-relaxed">
-                Track every movement from receiving to dispatch. Real-time dashboards provide instant insights into stock levels and asset location.
+                ติดตามทุกการเคลื่อนไหวตั้งแต่การรับเข้าจนถึงการจัดส่ง แดชบอร์ดแบบเรียลไทม์ให้ข้อมูลเชิงลึกเกี่ยวกับระดับสต็อกและตำแหน่งของสินทรัพย์ทันที
               </p>
             </div>
             <div className="text-center">
               <div className="w-24 h-20 bg-[#DCE8F7] rounded-[1.25rem] flex items-center justify-center mx-auto mb-6 border border-white/80 shadow-[6px_6px_14px_rgba(166,180,200,0.26),-6px_-6px_14px_rgba(255,255,255,0.9)]">
                 <ShieldCheck className="w-10 h-10 text-[#9ACD32]" />
               </div>
-              <h3 className="text-xl font-bold text-[#272727] mb-3">Enterprise Security</h3>
+              <h3 className="text-xl font-bold text-[#272727] mb-3">ความปลอดภัยระดับองค์กร</h3>
               <p className="text-[#7E5C4A] leading-relaxed">
-                Built with industry-standard encryption and role-based access control to ensure your data remains secure and compliant.
+                สร้างขึ้นด้วยการเข้ารหัสมาตรฐานอุตสาหกรรมและการควบคุมการเข้าถึงตามบทบาท เพื่อให้แน่ใจว่าข้อมูลของคุณยังคงปลอดภัยและเป็นไปตามข้อกำหนด
               </p>
             </div>
             <div className="text-center">
               <div className="w-24 h-20 bg-[#F8EAC8] rounded-[1.25rem] flex items-center justify-center mx-auto mb-6 border border-white/80 shadow-[6px_6px_14px_rgba(166,180,200,0.26),-6px_-6px_14px_rgba(255,255,255,0.9)]">
                 <Truck className="w-10 h-10 text-[#9ACD32]" />
               </div>
-              <h3 className="text-xl font-bold text-[#272727] mb-3">Operational Redundancy</h3>
+              <h3 className="text-xl font-bold text-[#272727] mb-3">ความต่อเนื่องในการดำเนินงาน</h3>
               <p className="text-[#7E5C4A] leading-relaxed">
-                Enable seamless team collaboration. No single point of failure means your operations continue smoothly even when key staff are away.
+                ช่วยให้ทีมทำงานร่วมกันได้อย่างราบรื่น อุดช่องโหว่เพื่อให้การดำเนินงานของคุณดำเนินไปอย่างราบรื่นแม้พนักงานหลักจะไม่อยู่
               </p>
             </div>
           </div>
@@ -927,36 +927,36 @@ export default function PendingPage() {
              <div className="relative z-10 flex flex-col md:flex-row items-center gap-12">
                 <div className="flex-1 space-y-6">
                   <div className="inline-block px-4 py-1.5 rounded-full bg-[#EEF2F6] border border-white/80 text-[#7E5C4A] text-sm font-medium shadow-[4px_4px_10px_rgba(166,180,200,0.24),-4px_-4px_10px_rgba(255,255,255,0.9)]">
-                    POWERED BY ANTIGRAVITY
+                    ขับเคลื่อนโดย ANTIGRAVITY (POWERED BY ANTIGRAVITY)
                   </div>
                   <h2 className="text-3xl md:text-5xl font-bold leading-tight text-[#272727]">
-                    Modern Architecture for <br/> <span className="text-transparent bg-clip-text bg-linear-to-r from-[#7E5C4A] to-[#9ACD32]">Maximum Performance</span>
+                    สถาปัตยกรรมสมัยใหม่เพื่อ <br/> <span className="text-transparent bg-clip-text bg-linear-to-r from-[#7E5C4A] to-[#9ACD32]">ประสิทธิภาพสูงสุด</span>
                   </h2>
                   <p className="text-[#7E5C4A] text-lg leading-relaxed max-w-xl">
-                    Leveraging the latest in web technology to deliver a lightning-fast, secure, and scalable experience.
+                    ใช้ประโยชน์จากเทคโนโลยีเว็บล่าสุดเพื่อมอบประสบการณ์ที่รวดเร็ว ปลอดภัย และขยายขนาดได้
                   </p>
                 </div>
                 
                 <div className="flex-1 grid grid-cols-2 gap-4 w-full md:w-auto">
                     <div className="p-6 rounded-2xl bg-[#EEF2F6]/95 border border-white/80 shadow-[5px_5px_12px_rgba(166,180,200,0.24),-5px_-5px_12px_rgba(255,255,255,0.92)] transition-all duration-300 hover:-translate-y-0.5">
                       <Server className="w-8 h-8 text-[#7E5C4A] mb-4" />
-                      <h4 className="font-bold text-lg mb-1 text-[#272727]">Next.js 14</h4>
-                      <p className="text-sm text-[#7E5C4A]">Server-side rendering for ultimate speed and SEO.</p>
+                      <h4 className="font-bold text-lg mb-1 text-[#272727]">Next.js 16</h4>
+                      <p className="text-sm text-[#7E5C4A]">การเรนเดอร์ฝั่งเซิร์ฟเวอร์เพื่อความเร็วและ SEO สูงสุด</p>
                     </div>
                     <div className="p-6 rounded-2xl bg-[#EEF2F6]/95 border border-white/80 shadow-[5px_5px_12px_rgba(166,180,200,0.24),-5px_-5px_12px_rgba(255,255,255,0.92)] transition-all duration-300 hover:-translate-y-0.5">
                       <Lock className="w-8 h-8 text-[#7E5C4A] mb-4" />
                       <h4 className="font-bold text-lg mb-1 text-[#272727]">Firebase Auth</h4>
-                      <p className="text-sm text-[#7E5C4A]">Secure identity management with Google integration.</p>
+                      <p className="text-sm text-[#7E5C4A]">การจัดการตัวตนที่ปลอดภัยด้วยการรวม Google</p>
                     </div>
                     <div className="p-6 rounded-2xl bg-[#EEF2F6]/95 border border-white/80 shadow-[5px_5px_12px_rgba(166,180,200,0.24),-5px_-5px_12px_rgba(255,255,255,0.92)] transition-all duration-300 hover:-translate-y-0.5">
                       <Database className="w-8 h-8 text-[#7E5C4A] mb-4" />
                       <h4 className="font-bold text-lg mb-1 text-[#272727]">Firestore</h4>
-                      <p className="text-sm text-[#7E5C4A]">Real-time NoSQL database for instant data sync.</p>
+                      <p className="text-sm text-[#7E5C4A]">ฐานข้อมูล NoSQL แบบเรียลไทม์สำหรับการซิงค์ทันที</p>
                     </div>
                     <div className="p-6 rounded-2xl bg-[#EEF2F6]/95 border border-white/80 shadow-[5px_5px_12px_rgba(166,180,200,0.24),-5px_-5px_12px_rgba(255,255,255,0.92)] transition-all duration-300 hover:-translate-y-0.5">
                       <FileText className="w-8 h-8 text-[#7E5C4A] mb-4" />
                       <h4 className="font-bold text-lg mb-1 text-[#272727]">Cloud Storage</h4>
-                      <p className="text-sm text-[#7E5C4A]">Enterprise-grade storage for documents and assets.</p>
+                      <p className="text-sm text-[#7E5C4A]">การจัดเก็บเอกสารและสินทรัพย์ระดับองค์กร</p>
                     </div>
                 </div>
              </div>
@@ -968,10 +968,10 @@ export default function PendingPage() {
       {/* 5. Problem & Solution Section */}
       <section className="mx-auto max-w-7xl px-6 py-24 bg-[#EEF2F6]/88 rounded-[2rem] my-10 border border-white/75 shadow-[10px_10px_22px_rgba(166,180,200,0.3),-10px_-10px_22px_rgba(255,255,255,0.92)] relative z-2">
         <h2 className="text-3xl font-bold mb-4 text-center text-[#272727]">
-          Common Challenges in Warehouse Operations
+          ความท้าทายทั่วไปในการดำเนินงานคลังสินค้า
         </h2>
         <p className="text-center text-[#7E5C4A] mb-16 max-w-2xl mx-auto">
-          Manual operations lead to errors, delays, and significant hidden costs.
+          การทำงานแบบแมนนวลนำไปสู่ข้อผิดพลาด ความล่าช้า และต้นทุนแฝงที่สำคัญ
         </p>
         
         <div className="grid gap-10 md:grid-cols-2">
@@ -981,17 +981,16 @@ export default function PendingPage() {
                  <AlertCircle size={24} className="text-[#9ACD32]" />
               </div>
               <div>
-                <h3 className="font-bold text-xl text-[#272727]">Manual & Fragmented Workflow</h3>
+                <h3 className="font-bold text-xl text-[#272727]">เวิร์กโฟลว์แบบแมนนวลและไม่เชื่อมต่อกัน</h3>
                 <p className="mt-4 text-[#7E5C4A] leading-relaxed">
-                  Using multiple paper systems leads to data mismatch. 
-                  Redundant data entry wastes time and increases error rates, distracting the team from core operational tasks.
+                  การใช้ระบบกระดาษหลายระบบทำให้ข้อมูลไม่ตรงกัน การป้อนข้อมูลซ้ำซ้อนทำให้เสียเวลาและเพิ่มอัตราข้อผิดพลาด ทำให้ทีมเสียสมาธิจากงานหลัก
                 </p>
               </div>
             </div>
             <div className="mt-8 pt-6 border-t border-[#9ACD32]/20">
               <div className={`inline-flex items-center gap-2 px-4 py-2 bg-[#EEF2F6] rounded-xl border border-white/80 ${CLAY_INSET}`}>
                 <CheckCircle2 size={20} className="text-[#7E5C4A]" />
-                <span className="font-bold text-[#7E5C4A]">Real-time Digital Workflow</span>
+                <span className="font-bold text-[#7E5C4A]">เวิร์กโฟลว์ดิจิทัลแบบเรียลไทม์</span>
               </div>
             </div>
           </GlassCard>
@@ -1002,17 +1001,16 @@ export default function PendingPage() {
                  <AlertCircle size={24} className="text-[#9ACD32]" />
               </div>
               <div>
-                <h3 className="font-bold text-xl text-[#272727]">Lack of Visibility</h3>
+                <h3 className="font-bold text-xl text-[#272727]">การขาดการมองเห็นภาพรวม</h3>
                 <p className="mt-4 text-[#7E5C4A] leading-relaxed">
-                  Executives lack real-time visibility into operations. 
-                  Reporting that lags by days or weeks leads to decisions based on outdated and potentially inaccurate information.
+                  ผู้บริหารขาดการมองเห็นการดำเนินงานแบบเรียลไทม์ การรายงานที่ล่าช้าเป็นสัปดาห์นำไปสู่การตัดสินใจที่ผิดพลาดจากข้อมูลที่ล้าสมัย
                 </p>
               </div>
             </div>
             <div className="mt-8 pt-6 border-t border-[#9ACD32]/20">
               <div className={`inline-flex items-center gap-2 px-4 py-2 bg-[#EEF2F6] rounded-xl border border-white/80 ${CLAY_INSET}`}>
                 <CheckCircle2 size={20} className="text-[#7E5C4A]" />
-                <span className="font-bold text-[#7E5C4A]">Instant Live Dashboard</span>
+                <span className="font-bold text-[#7E5C4A]">แดชบอร์ดสดทันที</span>
               </div>
             </div>
           </GlassCard>
@@ -1022,7 +1020,7 @@ export default function PendingPage() {
       {/* 5.5 Business Impact Section */}
       <section className="mx-auto max-w-7xl px-6 pb-24 relative z-2">
         <h2 className="text-3xl font-bold mb-12 text-center text-[#272727]">
-          Measurable Business Impact
+          ผลกระทบต่อธุรกิจที่วัดผลได้ (Business Impact)
         </h2>
         <div className="grid gap-8 md:grid-cols-3">
           
@@ -1030,9 +1028,9 @@ export default function PendingPage() {
             <div className={`px-6 py-3 bg-[#EEF2F6] rounded-xl mb-4 border border-white/80 ${CLAY_INSET}`}>
               <span className="text-5xl font-black text-[#272727] tracking-tight">-80%</span>
             </div>
-            <h3 className="text-xl font-bold text-[#272727] mb-3">Infrastructure Cost</h3>
+            <h3 className="text-xl font-bold text-[#272727] mb-3">ต้นทุนโครงสร้างพื้นฐาน</h3>
             <p className="text-[#7E5C4A] leading-relaxed text-sm">
-              No server hardware required. <br/> Pay only for what you use.
+              ไม่จำเป็นต้องใช้ฮาร์ดแวร์เซิร์ฟเวอร์ <br/> จ่ายเฉพาะสิ่งที่คุณใช้จริง
             </p>
           </GlassCard>
 
@@ -1040,9 +1038,9 @@ export default function PendingPage() {
             <div className={`px-6 py-3 bg-[#EEF2F6] rounded-xl mb-4 border border-white/80 ${CLAY_INSET}`}>
               <span className="text-5xl font-black text-[#272727] tracking-tight">+30%</span>
             </div>
-            <h3 className="text-xl font-bold text-[#272727] mb-3">Operational Efficiency</h3>
+            <h3 className="text-xl font-bold text-[#272727] mb-3">ประสิทธิภาพการดำเนินงาน</h3>
             <p className="text-[#7E5C4A] leading-relaxed text-sm">
-               Accelerate workflows, reduce redundancy, and minimize human error.
+               เร่งเวิร์กโฟลว์ ลดความซ้ำซ้อน และลดข้อผิดพลาดจากมนุษย์
             </p>
           </GlassCard>
 
@@ -1050,9 +1048,9 @@ export default function PendingPage() {
             <div className={`px-6 py-3 bg-[#EEF2F6] rounded-xl mb-4 border border-white/80 ${CLAY_INSET}`}>
               <span className="text-5xl font-black text-[#272727] tracking-tight">1-4</span>
             </div>
-            <h3 className="text-xl font-bold text-[#272727] mb-3">Weeks to Value</h3>
+            <h3 className="text-xl font-bold text-[#272727] mb-3">ระยะเวลาการสร้างมูลค่า</h3>
             <p className="text-[#7E5C4A] leading-relaxed text-sm">
-               Rapid deployment. <br/> Go live in weeks, not years.
+               การปรับใช้อย่างรวดเร็ว <br/> พร้อมใช้งานในไม่กี่สัปดาห์ ไม่ใช่เป็นปี
             </p>
           </GlassCard>
 
@@ -1077,33 +1075,33 @@ export default function PendingPage() {
       {/* 6. How It Works Section */}
       <section className="mx-auto max-w-7xl px-6 py-24 relative z-2">
         <h2 className="text-3xl font-bold mb-16 text-center text-[#272727]">
-          How It Works
+          มันทำงานอย่างไร (How It Works)
         </h2>
         <div className="grid gap-10 md:grid-cols-4 text-center">
           {[
             {
               icon: UserCircle,
               step: '1',
-              title: 'Login',
-              desc: 'Secure role-based access control with verifiable audit trails.'
+              title: 'เข้าสู่ระบบ',
+              desc: 'การควบคุมการเข้าถึงตามบทบาทที่ปลอดภัย พร้อมบันทึกการตรวจสอบที่ตรวจสอบได้'
             },
             {
               icon: Truck,
               step: '2',
-              title: 'Operate',
-              desc: 'Receive & Dispatch tasks directly via mobile or tablet devices.'
+              title: 'ดำเนินงาน',
+              desc: 'จัดกำรภารกิจการรับเข้าและจัดส่งสินค้าผ่านอุปกรณ์พกพาหรือแท็บเล็ตได้โดยตรง'
             },
             {
               icon: RefreshCw,
               step: '3',
-              title: 'Realtime Update',
-              desc: 'Instant data synchronization across all devices. No need to wait for sync.'
+              title: 'อัปเดตเรียลไทม์',
+              desc: 'การซิงโครไนซ์ข้อมูลทันทีในทุกอุปกรณ์ ไม่ต้องรอขั้นตอนการซิงค์ข้อมูล'
             },
             {
               icon: BarChart3,
               step: '4',
-              title: 'Decision',
-              desc: 'Live Dashboard & automated alerts for precise, data-driven decisions.'
+              title: 'การตัดสินใจ',
+              desc: 'แดชบอร์ดสดและการแจ้งเตือนอัตโนมัติ เพื่อการตัดสินใจที่แม่นยำตามข้อมูล'
             }
           ].map((item, index) => (
             <GlassCard key={index} className={`${CLAY_CARD_BASE} p-8 flex flex-col items-center transition-all duration-300 group hover:-translate-y-1`}>
@@ -1122,29 +1120,29 @@ export default function PendingPage() {
       <section className="py-24 bg-[#EEF2F6]/70 backdrop-blur-sm border-y border-white/70 relative z-2">
         <div className="mx-auto max-w-7xl px-6">
           <h2 className="text-3xl font-bold mb-16 text-center text-[#272727]">
-            Enterprise-Grade Architecture & Security
+            สถาปัตยกรรมและความปลอดภัยระดับองค์กร
           </h2>
           <div className="grid gap-8 md:grid-cols-4">
             {[
               {
                 icon: ShieldCheck,
-                title: "Authentication",
-                desc: "Firebase Auth · MFA · Role-Based Access Control"
+                title: "การยืนยันตัวตน",
+                desc: "Firebase Auth · MFA · การควบคุมตามบทบาท"
               },
               {
                 icon: Database,
-                title: "Realtime Database",
-                desc: "Cloud Firestore · Instant Realtime Sync"
+                title: "ฐานข้อมูลเรียลไทม์",
+                desc: "Cloud Firestore · การซิงค์ทันที"
               },
               {
                 icon: Server,
-                title: "Serverless Backend",
-                desc: "Cloud Functions · Auto Scaling Infrastructure"
+                title: "ระบบหลังบ้าน Serverless",
+                desc: "Cloud Functions · โครงสร้างพื้นฐานปรับขนาดอัตโนมัติ"
               },
               {
                 icon: GlobeLock,
-                title: "Infrastructure",
-                desc: "Vercel Edge Network · HTTPS · DDoS Protection"
+                title: "โครงสร้างพื้นฐานทั่วโลก",
+                desc: "Vercel Edge Network · HTTPS · การป้องกัน DDoS"
               }
             ].map((item, index) => (
                <div key={index} className="rounded-2xl bg-[#EEF2F6]/95 p-8 border border-white/80 shadow-[6px_6px_14px_rgba(166,180,200,0.28),-6px_-6px_14px_rgba(255,255,255,0.92)] hover:-translate-y-1 transition-all">
@@ -1169,8 +1167,8 @@ export default function PendingPage() {
           
           <div className="max-w-2xl mx-auto mb-10">
              <p className="text-sm mb-6">
-               Centralized Work Hub for Warehouse & Logistics Management. <br/>
-               Empowering teams with real-time data and seamless collaboration tools.
+               ศูนย์รวมงานสำหรับการจัดการคลังสินค้าและลอจิสติกส์ <br/>
+               เพิ่มศักยภาพให้ทีมด้วยข้อมูลเรียลไทม์และเครื่องมือการทำงานร่วมกันที่ไร้รอยต่อ
              </p>
              <div className="flex justify-center gap-6 text-2xl opacity-60">
                {/* Tech Logos (Text representation for now) */}
@@ -1182,9 +1180,9 @@ export default function PendingPage() {
           </div>
 
           <div className="border-t border-white/75 pt-8 flex flex-col md:flex-row justify-between items-center text-xs">
-            <p>© {new Date().getFullYear()} BPI AeroPath. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} BPI AeroPath. สงวนลิขสิทธิ์ทั้งหมด</p>
             <p className="mt-2 md:mt-0">
-              Created by <span className="text-[#9ACD32] font-bold">Antigravity</span>
+               สร้างโดย (Created by) <span className="text-[#9ACD32] font-bold">Antigravity</span>
             </p>
           </div>
         </div>
