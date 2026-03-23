@@ -664,23 +664,8 @@ const loadReportsFromFirestore = async (): Promise<PackingReportRow[]> => {
   let snapshot = await getDocs(colRef);
 
   if (snapshot.empty) {
-    const res = await fetch(REPORTS_SOURCE_CSV);
-    if (!res.ok) throw new Error(`CSV load failed (${res.status})`);
-    const csvText = await res.text();
-    const initialRows = parsePackingCsv(csvText);
-
-    const chunkSize = 450;
-    for (let i = 0; i < initialRows.length; i += chunkSize) {
-      const batch = writeBatch(db);
-      const chunk = initialRows.slice(i, i + chunkSize);
-      chunk.forEach((row, chunkIndex) => {
-        const seedIndex = i + chunkIndex + 1;
-        const docRef = doc(colRef, `seed-${String(seedIndex).padStart(5, "0")}`);
-        batch.set(docRef, toFirestoreReportPayload({ ...row, id: docRef.id }));
-      });
-      await batch.commit();
-    }
-    snapshot = await getDocs(colRef);
+    // Database empty, no auto-seeding required since data has been migrated via import script.
+    return [];
   }
 
   const rowsFromSnapshot = snapshot.docs.map((item) => mapAnyToPackingReportRow(item.id, item.data()));
