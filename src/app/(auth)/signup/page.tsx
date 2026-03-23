@@ -26,7 +26,7 @@ export default function SignupPage() {
     clearError();
 
     if (password !== confirmPassword) {
-      alert("รหัสผ่านไม่ตรงกัน");
+      alert("Passwords do not match");
       return;
     }
     
@@ -55,7 +55,7 @@ export default function SignupPage() {
         )}
 
         <div className="mb-8 md:hidden text-center">
-           <h1 className="text-3xl font-black text-[#272727] uppercase italic tracking-tighter">สร้างบัญชีใหม่</h1>
+           <h1 className="text-3xl font-black text-[#272727] uppercase italic tracking-tighter">Create Account</h1>
         </div>
 
         {/* Google Signup */}
@@ -82,12 +82,12 @@ export default function SignupPage() {
               fill="#EA4335"
             />
           </svg>
-          สร้างบัญชีด้วย Google
+          Sign up with Google
         </button>
 
         <div className="relative mb-8 flex items-center gap-4">
           <div className="flex-1 border-t-2 border-[#D4AA7D]/20"></div>
-          <div className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.3em] italic">สร้างบัญชีใหม่</div>
+          <div className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.3em] italic">New Terminal</div>
           <div className="flex-1 border-t-2 border-[#D4AA7D]/20"></div>
         </div>
 
@@ -96,7 +96,7 @@ export default function SignupPage() {
           className="space-y-4"
         >
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.2em] ml-1">ชื่อ-นามสกุล</label>
+            <label className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.2em] ml-1">Identity Name</label>
             <div className="relative group">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#D4AA7D] group-focus-within:text-[#7E5C4A] transition-all duration-300" />
               <input
@@ -111,7 +111,7 @@ export default function SignupPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.2em] ml-1">อีเมล</label>
+            <label className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.2em] ml-1">Email Terminal</label>
             <div className="relative group">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#D4AA7D] group-focus-within:text-[#7E5C4A] transition-all duration-300" />
               <input
@@ -127,7 +127,7 @@ export default function SignupPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.2em] ml-1">รหัสผ่าน</label>
+              <label className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.2em] ml-1">Access Key</label>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#D4AA7D] group-focus-within:text-[#7E5C4A] transition-all duration-300" />
                 <input
@@ -150,7 +150,7 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.2em] ml-1">ยืนยันรหัสผ่าน</label>
+              <label className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.2em] ml-1">Confirm</label>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#D4AA7D] group-focus-within:text-[#7E5C4A] transition-all duration-300" />
                 <input
@@ -182,7 +182,7 @@ export default function SignupPage() {
               <div className="w-5 h-5 border-3 border-[#EFD09E]/30 border-t-[#9ACD32] rounded-full animate-spin" />
             ) : (
               <>
-                สร้างบัญชี <ArrowRight className="w-5 h-5 text-[#9ACD32] group-hover:translate-x-1 transition-transform" />
+                Initialize Account <ArrowRight className="w-5 h-5 text-[#9ACD32] group-hover:translate-x-1 transition-transform" />
               </>
             )}
           </button>

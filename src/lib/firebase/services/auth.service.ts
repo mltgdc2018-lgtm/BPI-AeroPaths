@@ -253,45 +253,45 @@ function mapAuthError(error: unknown): AuthError {
   console.error("Auth Debug - Code:", firebaseError.code);
   console.error("Auth Debug - Message:", firebaseError.message);
   
-  let message = "เกิดข้อผิดพลาดที่ไม่คาดคิด โปรดลองใหม่อีกครั้ง";
+  let message = "An unexpected error occurred. Please try again.";
   
   const code = firebaseError.code;
   switch (code) {
     case 'auth/invalid-email':
-      message = "รูปแบบอีเมลไม่ถูกต้อง";
+      message = "Invalid email format.";
       break;
     case 'auth/user-not-found':
-      message = "ไม่พบผู้ใช้งานนี้ในระบบ";
+      message = "User not found.";
       break;
     case 'auth/wrong-password':
-      message = "รหัสผ่านไม่ถูกต้อง";
+      message = "Incorrect password.";
       break;
     case 'auth/invalid-credential':
-      message = "อีเมลหรือรหัสผ่านไม่ถูกต้อง โปรดตรวจสอบอีกครั้ง";
+      message = "Invalid email or password. Please check and try again.";
       break;
     case 'auth/email-already-in-use':
-      message = "อีเมลนี้ถูกใช้งานไปแล้ว";
+      message = "Email is already in use.";
       break;
     case 'auth/weak-password':
-      message = "รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร";
+      message = "Password must be at least 6 characters.";
       break;
     case 'auth/popup-closed-by-user':
-      message = "การเข้าสู่ระบบถูกยกเลิกโดยผู้ใช้งาน";
+      message = "Sign-in was cancelled by user.";
       break;
     case 'auth/popup-blocked':
-      message = "ป๊อปอัพเข้าสู่ระบบถูกบล็อกโดยเบราว์เซอร์ของคุณ โปรดอนุญาตป๊อปอัพสำหรับเว็บไซต์นี้";
+      message = "Sign-in popup was blocked by your browser. Please allow popups for this site.";
       break;
     case 'auth/operation-not-allowed':
-      message = "การเข้าสู่ระบบด้วย Google ยังไม่ถูกเปิดใช้งานในโปรเจกต์นี้";
+      message = "Google Sign-In is not enabled in the Firebase project settings.";
       break;
     case 'auth/unauthorized-domain':
-      message = "โดเมนนี้ไม่ได้รับอนุญาตให้เข้าสู่ระบบด้วย Google";
+      message = "This domain is not authorized for Google Sign-In. Please check Firebase console.";
       break;
     case 'auth/too-many-requests':
-      message = "มีการพยายามเข้าสู่ระบบล้มเหลวมากเกินไป โปรดลองใหม่ในภายหลัง";
+      message = "Too many failed login attempts. Please try again later.";
       break;
     case 'auth/network-request-failed':
-      message = "ข้อผิดพลาดของเครือข่าย โปรดตรวจสอบการเชื่อมต่อของคุณ";
+      message = "Network error. Please check your connection.";
       break;
   }
   

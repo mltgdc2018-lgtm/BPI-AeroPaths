@@ -32,9 +32,15 @@ jobs:
 
       - name: Deploy Firestore & Storage Rules
         run: |
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > service-account.json
-          GOOGLE_APPLICATION_CREDENTIALS=service-account.json npx firebase-tools deploy --only firestore:rules,storage:rules --project bpi-aeropaths
-          rm service-account.json
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            echo "Error: FIREBASE_SERVICE_ACCOUNT secret is missing or empty!"
+            echo "Please add it to your GitHub Repository Secrets."
+            exit 1
+          fi
+          cat <<< "$FIREBASE_SERVICE_ACCOUNT" > service-account.json
+          export GOOGLE_APPLICATION_CREDENTIALS="${GITHUB_WORKSPACE}/service-account.json"
+          npx firebase-tools deploy --only firestore:rules,storage --project bpi-aeropaths --non-interactive
+          rm -f service-account.json
         env:
           FIREBASE_SERVICE_ACCOUNT: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
 

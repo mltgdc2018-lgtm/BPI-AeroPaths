@@ -51,9 +51,9 @@ export default function LoginPage() {
           <div className="w-20 h-20 bg-[#9ACD32]/15 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-bounce-subtle border border-[#9ACD32]/30 shadow-[4px_4px_10px_rgba(166,180,200,0.22),-4px_-4px_10px_rgba(255,255,255,0.9)]">
             <CheckCircle2 className="w-10 h-10 text-[#9ACD32]" />
           </div>
-          <h2 className="text-3xl font-black text-[#272727] mb-4">ตรวจสอบอีเมลของคุณ</h2>
+          <h2 className="text-3xl font-black text-[#272727] mb-4">Check your email</h2>
           <p className="text-[#7E5C4A] mb-8 font-medium">
-            เราได้ส่งคำแนะนำในการรีเซ็ตรหัสผ่านไปที่ <strong>{email}</strong> แล้ว
+            We&apos;ve sent password reset instructions to <strong>{email}</strong>
           </p>
           <button
             onClick={() => {
@@ -62,7 +62,7 @@ export default function LoginPage() {
             }}
             className="w-full py-4 bg-[#272727] text-[#EFD09E] rounded-2xl font-bold shadow-lg shadow-[#272727]/20 border border-[#EFD09E]/20 hover:bg-[#272727]/90 transition-all"
           >
-            กลับไปหน้าเข้าสู่ระบบ
+            Back to Sign In
           </button>
         </div>
       </AuthContainer>
@@ -75,12 +75,12 @@ export default function LoginPage() {
         {error && (
           <div className="mb-6 p-4 bg-red-50/80 backdrop-blur-md border border-red-200/60 rounded-2xl flex items-start gap-3 text-red-700 text-sm animate-shake shadow-[4px_4px_10px_rgba(166,180,200,0.2),-4px_-4px_10px_rgba(255,255,255,0.88)]">
             <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-            <p className="font-bold">อีเมลหรือรหัสผ่านไม่ถูกต้อง โปรดตรวจสอบอีกครั้ง</p>
+            <p className="font-bold">Invalid email or password. Please check and try again.</p>
           </div>
         )}
 
         <div className="mb-8 md:hidden text-center">
-           <h1 className="text-3xl font-black text-[#272727] uppercase italic tracking-tighter">เข้าสู่ระบบ</h1>
+           <h1 className="text-3xl font-black text-[#272727] uppercase italic tracking-tighter">Sign In</h1>
         </div>
 
         {/* Google Login */}
@@ -107,12 +107,12 @@ export default function LoginPage() {
               fill="#EA4335"
             />
           </svg>
-          เข้าสู่ระบบด้วย Google
+          Sign in with Google
         </button>
 
         <div className="relative mb-8 flex items-center gap-4">
           <div className="flex-1 border-t-2 border-[#D4AA7D]/20"></div>
-          <div className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.3em] italic">การเข้าถึงที่ปลอดภัย</div>
+          <div className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.3em] italic">Secure Access</div>
           <div className="flex-1 border-t-2 border-[#D4AA7D]/20"></div>
         </div>
 
@@ -121,7 +121,7 @@ export default function LoginPage() {
           className="space-y-5"
         >
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.2em] ml-1">อีเมล</label>
+            <label className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.2em] ml-1">Email Terminal</label>
             <div className="relative group">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#D4AA7D] group-focus-within:text-[#7E5C4A] transition-all duration-300" />
               <input
@@ -138,13 +138,13 @@ export default function LoginPage() {
           {!isForgotPassword && (
             <div className="space-y-2">
               <div className="flex justify-between items-center ml-1">
-                <label className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.2em]">รหัสผ่าน</label>
+                <label className="text-[10px] font-black text-[#7E5C4A] uppercase tracking-[0.2em]">Access Key</label>
                 <button
                   type="button"
                   onClick={() => setIsForgotPassword(true)}
                   className="text-[10px] font-black text-[#D4AA7D] hover:text-[#7E5C4A] uppercase tracking-widest transition-colors"
                 >
-                  ลืมรหัสผ่าน?
+                  Retrieve Key
                 </button>
               </div>
               <div className="relative group">
@@ -177,7 +177,7 @@ export default function LoginPage() {
               <div className="w-5 h-5 border-3 border-white/30 border-t-[#9ACD32] rounded-full animate-spin" />
             ) : (
               <>
-                {isForgotPassword ? "ส่งรหัสรีเซ็ต" : "เข้าสู่ระบบ"} <ArrowRight className="w-5 h-5 text-[#9ACD32] group-hover:translate-x-1 transition-transform" />
+                {isForgotPassword ? "Send Reset Key" : "Execute Login"} <ArrowRight className="w-5 h-5 text-[#9ACD32] group-hover:translate-x-1 transition-transform" />
               </>
             )}
           </button>
@@ -189,7 +189,7 @@ export default function LoginPage() {
             onClick={() => setIsForgotPassword(false)}
             className="w-full text-center text-sm font-bold text-[#7E5C4A]/60 hover:text-[#7E5C4A] transition-colors mt-6"
           >
-            กลับไปหน้าเข้าสู่ระบบ
+            Back to Sign In
           </button>
         )}
       </div>
