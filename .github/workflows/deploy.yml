@@ -7,11 +7,8 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
-
     env:
-      # จัดการเรื่อง Warning ของ GitHub และเปิดโหมดทดลองของ Firebase ให้ครอบคลุมทั้ง Job
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-      FIREBASE_CLI_EXPERIMENTS: webframeworks
 
     steps:
       - name: Checkout Code
@@ -29,7 +26,6 @@ jobs:
       - name: Build Next.js App
         run: npm run build
         env:
-        
           NEXT_PUBLIC_FIREBASE_API_KEY: "${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}"
           NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}"
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: "${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}"
@@ -39,21 +35,22 @@ jobs:
           BOT_API_KEY: "${{ secrets.BOT_API_KEY }}"
 
       - name: Deploy to Firebase (Rules, Storage & Hosting)
+        # ขั้นตอนนี้จะรวบยอดการ Deploy ทั้งหมดด้วยคำสั่ง npx ตรงๆ ไม่ผ่านปลั๊กอิน
         run: |
-          # 1. เช็กความถูกต้องของ Secret
           if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
             echo "::error::FIREBASE_SERVICE_ACCOUNT secret is missing or empty!"
             exit 1
           fi
           
-          # 2. สร้างไฟล์ JSON สำหรับยืนยันตัวตน
+          # สร้างไฟล์ JSON
           cat <<< "$FIREBASE_SERVICE_ACCOUNT" > service-account.json
           export GOOGLE_APPLICATION_CREDENTIALS="${GITHUB_WORKSPACE}/service-account.json"
           
-          # 3. รันคำสั่ง Deploy รวดเดียวจบ ทั้งเว็บและฐานข้อมูล
+          # สั่ง Deploy โดยเปิด webframeworks ไว้ในสภาพแวดล้อมชั่วคราว
+          export FIREBASE_CLI_EXPERIMENTS=webframeworks
           npx firebase-tools deploy --only hosting,firestore:rules,storage --project bpi-aeropaths --non-interactive
           
-          # 4. ลบไฟล์ทิ้งเพื่อความปลอดภัย
+          # ลบไฟล์
           rm -f service-account.json
         env:
           FIREBASE_SERVICE_ACCOUNT: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
