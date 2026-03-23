@@ -55,7 +55,20 @@ export async function fetchOilPrices(): Promise<unknown> {
     throw new Error(`Failed to fetch oil prices: ${response.statusText}`);
   }
 
-  return response.json();
+  const json = await response.json();
+  
+  // Normalize Bangchak API structure
+  // The API returns an array like [{ OilList: "[...]", ... }]
+  if (Array.isArray(json) && json.length > 0 && json[0].OilList) {
+    try {
+      return JSON.parse(json[0].OilList);
+    } catch (e) {
+      console.error("Failed to parse OilList string:", e);
+      return [];
+    }
+  }
+
+  return json;
 }
 
 // ============================================================================

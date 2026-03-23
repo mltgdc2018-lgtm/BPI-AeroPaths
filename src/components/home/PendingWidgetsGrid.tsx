@@ -313,19 +313,19 @@ function OilPriceWidget() {
         }
 
         if (json.success !== false) {
-          // The API returns { data: [...] } or just [...]
-          const fuelData = Array.isArray(data) ? data : (data.OilList ? JSON.parse(data.OilList) : []);
+          // The API now returns a normalized array of fuel objects via fetchOilPrices() normalization
+          const fuelData = Array.isArray(data) ? data : [];
           
           const allFuels: OilPrice[] = fuelData
-            .filter((item: Record<string, string>) => item?.OilName)
-            .map((item: Record<string, string>) => {
-              const priceToday = parseFloat(item.PriceToday) || 0;
-              const priceYesterday = item.PriceYesterday ? parseFloat(item.PriceYesterday) : priceToday;
+            .filter((item: Record<string, unknown>) => item?.OilName)
+            .map((item: Record<string, unknown>) => {
+              const priceToday = parseFloat(String(item.PriceToday)) || 0;
+              const priceYesterday = item.PriceYesterday ? parseFloat(String(item.PriceYesterday)) : priceToday;
               const change = priceToday - priceYesterday;
               const trend: OilPrice["trend"] = change > 0 ? "up" : change < 0 ? "down" : "flat";
 
               return {
-                OilName: item.OilName,
+                OilName: String(item.OilName),
                 PriceToday: priceToday,
                 PriceYesterday: priceYesterday,
                 change,
