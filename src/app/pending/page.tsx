@@ -335,21 +335,27 @@ function OilPriceWidget() {
         // Wrapper support: json.data contains the array
         const data = json.data || json;
 
-        if (Array.isArray(data) && data.length > 0 && data[0].OilList) {
-          // OilList is a JSON string inside the first element
-          const oilListStr = data[0].OilList;
-          const oilList = typeof oilListStr === 'string' ? JSON.parse(oilListStr) : oilListStr;
+        if (json.success !== false) {
+          const fuelData = Array.isArray(data) ? data : [];
+          let rawList: any[] = [];
           
-          const allFuels: OilPrice[] = (oilList as { OilName?: string; PriceToday?: number; PriceYesterday?: number }[])
-            .filter((item) => item?.OilName && typeof item.OilName === "string")
-            .map((item) => {
-              const priceToday = item.PriceToday || 0;
-              const priceYesterday = typeof item.PriceYesterday === "number" ? item.PriceYesterday : null;
+          if (fuelData.length > 0 && fuelData[0].OilList) {
+            const oilListStr = fuelData[0].OilList;
+            rawList = typeof oilListStr === 'string' ? JSON.parse(oilListStr) : oilListStr;
+          } else if (fuelData.length > 0 && fuelData[0].OilName) {
+            rawList = fuelData;
+          }
+          
+          const allFuels: OilPrice[] = rawList
+            .filter((item: any) => item?.OilName && typeof item.OilName === "string")
+            .map((item: any) => {
+              const priceToday = parseFloat(String(item.PriceToday)) || 0;
+              const priceYesterday = item.PriceYesterday ? parseFloat(String(item.PriceYesterday)) : null;
               const change = priceYesterday === null ? 0 : priceToday - priceYesterday;
               const trend: OilPrice["trend"] = change > 0 ? "up" : change < 0 ? "down" : "flat";
 
               return {
-                OilName: item.OilName!,
+                OilName: item.OilName,
                 PriceToday: priceToday,
                 PriceYesterday: priceYesterday,
                 change,

@@ -313,10 +313,17 @@ function OilPriceWidget() {
         }
 
         if (json.success !== false) {
-          // The API now returns a normalized array of fuel objects via fetchOilPrices() normalization
           const fuelData = Array.isArray(data) ? data : [];
+          let rawList: any[] = [];
+
+          if (fuelData.length > 0 && fuelData[0].OilList) {
+            const oilListStr = fuelData[0].OilList;
+            rawList = typeof oilListStr === 'string' ? JSON.parse(oilListStr) : oilListStr;
+          } else if (fuelData.length > 0 && fuelData[0].OilName) {
+            rawList = fuelData;
+          }
           
-          const allFuels: OilPrice[] = fuelData
+          const allFuels: OilPrice[] = rawList
             .filter((item: Record<string, unknown>) => item?.OilName)
             .map((item: Record<string, unknown>) => {
               const priceToday = parseFloat(String(item.PriceToday)) || 0;
