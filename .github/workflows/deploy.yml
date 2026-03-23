@@ -33,4 +33,5 @@ jobs:
         run: |
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > service-account.json
           export GOOGLE_APPLICATION_CREDENTIALS=service-account.json
+          firebase experiments:enable webframeworks
           firebase deploy --project bpi-aeropaths
