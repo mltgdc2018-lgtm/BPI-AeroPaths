@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/cron/fetch-oil",
-      "schedule": "0 23 * * *"
+      "schedule": "30 11 * * *"
     }
   ]
 }
