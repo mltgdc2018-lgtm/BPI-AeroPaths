@@ -34,7 +34,7 @@ export function getBangkokTimeInfo(date: Date = new Date()) {
 // OIL PRICE
 // ============================================================================
 
-const OIL_PRICE_URL = "https://oil-price.bangchak.co.th/ApiOilPrice2";
+const OIL_PRICE_URL = "https://oil-price.bangchak.co.th/ApiOilPrice2/en";
 const OIL_PRICE_HEADERS = {
   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
   "Accept": "application/json",
