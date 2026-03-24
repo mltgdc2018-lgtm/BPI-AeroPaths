@@ -2,7 +2,6 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { PackingPlanResult } from "@/lib/services/packing-logic/packing.types";
 import { TDocumentDefinitions, Content, Style, TableCell } from "pdfmake/interfaces";
-import { sarabunFonts } from "@/lib/utils/sarabunFonts";
 
 type PdfFontFamily = {
   normal: string;
@@ -22,15 +21,30 @@ type PdfMakeRuntime = {
   ) => { download: (fileName?: string) => void };
 };
 
+// --- Font Loading Helpers ---
+
+async function fetchFont(url: string): Promise<string> {
+  const response = await fetch(url);
+  const arrayBuffer = await response.arrayBuffer();
+  // Convert ArrayBuffer to base64 for pdfMake VFS
+  const bytes = new Uint8Array(arrayBuffer);
+  let binary = "";
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
 function getDefaultVfs(): Record<string, string> {
   const withPdfMake = pdfFonts as { pdfMake?: { vfs?: Record<string, string> } };
   return withPdfMake.pdfMake?.vfs ?? (pdfFonts as unknown as Record<string, string>);
 }
 
-function buildVfs(): Record<string, string> {
+async function buildVfs(): Promise<Record<string, string>> {
+  const sarabunData = await fetchFont("/fonts/Sarabun-Regular.ttf");
   return {
     ...getDefaultVfs(),
-    ...sarabunFonts,
+    "Sarabun-Regular.ttf": sarabunData,
   };
 }
 
@@ -80,8 +94,7 @@ export const generatePackingListPDFMake = async (
   const dd = String(now.getDate()).padStart(2, '0');
   const filenameTimestamp = `${yyyy}${MM}${dd}${HH}${mm}${ss}`;
 
-  const vfs = buildVfs();
-  const fonts = buildFonts();
+  const [vfs, fonts] = await Promise.all([buildVfs(), buildFonts()]);
   const defaultFontFamily = "Sarabun";
 
   // --- Calculate Totals ---

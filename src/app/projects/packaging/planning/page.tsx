@@ -26,9 +26,8 @@ import { CUSTOMER_PACK_TYPE_MAPPING, PACKAGE_MASTER_DATA } from "@/lib/config/pa
 import { PackagingService } from "@/lib/firebase/services/packaging.service";
 import { PackingLogicService } from "@/lib/services/packing-logic/PackingLogicService";
 import type { PackingInput, PackingOutput, PackedCase, PackingPlanResult } from "@/lib/services/packing-logic/packing.types";
-import { generatePackingListPDFMake } from "@/lib/utils/pdfMakeGenerator";
-import { generatePackingListPDF } from "@/lib/utils/pdfGenerator";
-import { generatePackingDetailsPDF } from "@/lib/utils/pdfTemplateGenerator";
+// Removed static imports for PDF generators to optimize bundle size
+
 import { AdjustmentToolbar } from "@/components/projects/packaging/planning/AdjustmentToolbar";
 import { EditableCaseRow } from "@/components/projects/packaging/planning/EditableCaseRow";
 import { PackingDetailsExportDialog } from "@/components/projects/packaging/planning/PackingDetailsExportDialog";
@@ -527,11 +526,11 @@ export default function PackagingBookingPage() {
     }
 
     try {
+      const { generatePackingListPDFMake } = await import("@/lib/utils/pdfMakeGenerator");
       await generatePackingListPDFMake(pdfData, selectedCustomer.code, poList, totalItemsRequired);
     } catch (error) {
-      console.error("PDFMake export failed. Falling back to jsPDF.", error);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      generatePackingListPDF(pdfData as any, selectedCustomer.code, poList);
+      console.error("PDF export failed.", error);
+      alert("Failed to generate PDF. Please try again.");
     } finally {
       setIsExportingPlan(false);
     }
@@ -566,6 +565,7 @@ export default function PackagingBookingPage() {
 
     setIsExportingPackingDetails(true);
     try {
+      const { generatePackingDetailsPDF } = await import("@/lib/utils/pdfTemplateGenerator");
       await generatePackingDetailsPDF(built.entries, selectedCustomer.code);
       setIsPackingDetailsDialogOpen(false);
     } finally {

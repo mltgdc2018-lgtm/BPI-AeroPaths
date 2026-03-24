@@ -19,8 +19,6 @@
     "firebase": "^12.8.0",
     "firebase-admin": "^13.7.0",
     "framer-motion": "^12.34.0",
-    "jspdf": "^4.1.0",
-    "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.563.0",
     "mermaid": "^11.12.2",
     "motion": "^12.34.3",

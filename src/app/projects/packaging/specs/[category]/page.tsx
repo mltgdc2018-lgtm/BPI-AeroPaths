@@ -20,7 +20,8 @@ import { SearchToolbar } from "@/components/shared/SearchToolbar";
 import { ModuleHeader } from "@/components/projects/material-control/ModuleHeader";
 import { cn } from "@/lib/utils/cn";
 import { PackagingService, PackagingProductDTO, IActivityChange } from "@/lib/firebase/services/packaging.service";
-import { generatePackagingSpecPDF } from "@/lib/utils/pdfGenerator";
+// Removed static import for pdfGenerator to optimize bundle size
+
 
 // Types
 interface PackingRule {
@@ -1457,7 +1458,14 @@ export default function CategoryDetailPage() {
             {/* Footer Actions */}
             <div className="pt-6 border-t border-[#F2C464]/30 flex gap-4">
               <button 
-                onClick={() => selectedItem && generatePackagingSpecPDF(selectedItem as PackagingProduct)}
+                onClick={async () => {
+                  if (selectedItem) {
+                    const { generatePackagingSpecPDFMake } = await import("@/lib/utils/pdfSpecGenerator");
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    await generatePackagingSpecPDFMake(selectedItem as any);
+                  }
+                }}
+
                 className="flex-1 py-4 bg-[#F6EDDE] hover:bg-[#272727] text-[#7E5C4A] hover:text-[#EFD09E] rounded-2xl border border-[#D4AA7D]/45 hover:border-[#7E5C4A]/55 font-black text-sm transition-all uppercase tracking-widest hover:shadow-md flex items-center justify-center gap-2"
               >
                 <Download className="w-4 h-4" /> Download PDF Spec

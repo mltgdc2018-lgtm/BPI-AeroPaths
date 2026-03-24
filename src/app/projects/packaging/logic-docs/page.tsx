@@ -17,37 +17,44 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { GlassCard } from "@/components/shared/GlassCard";
-import mermaid from "mermaid";
-
-// Initialize mermaid
-mermaid.initialize({
-  startOnLoad: true,
-  theme: 'neutral',
-  securityLevel: 'loose',
-  flowchart: {
-    useMaxWidth: true,
-    htmlLabels: true,
-    curve: 'basis'
-  },
-  themeVariables: {
-    primaryColor: '#EFD09E',
-    primaryBorderColor: '#7E5C4A',
-    primaryTextColor: '#272727',
-    lineColor: '#7E5C4A',
-    tertiaryColor: '#F6EDDE'
-  }
-});
-
 const MermaidDiagram = ({ chart }: { chart: string }) => {
   const ref = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mermaidInstance, setMermaidInstance] = useState<any>(null);
 
   useEffect(() => {
-    if (ref.current) {
-      mermaid.render(`mermaid-${Math.random().toString(36).substring(2, 11)}`, chart).then(({ svg }) => {
+    // Dynamically import mermaid only when component mounts
+    import("mermaid").then((m) => {
+      const mermaid = m.default;
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'neutral',
+        securityLevel: 'loose',
+        flowchart: {
+          useMaxWidth: true,
+          htmlLabels: true,
+          curve: 'basis'
+        },
+        themeVariables: {
+          primaryColor: '#EFD09E',
+          primaryBorderColor: '#7E5C4A',
+          primaryTextColor: '#272727',
+          lineColor: '#7E5C4A',
+          tertiaryColor: '#F6EDDE'
+        }
+      });
+      setMermaidInstance(mermaid);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (ref.current && mermaidInstance) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mermaidInstance.render(`mermaid-${Math.random().toString(36).substring(2, 11)}`, chart).then(({ svg }: any) => {
         if (ref.current) ref.current.innerHTML = svg;
       });
     }
-  }, [chart]);
+  }, [chart, mermaidInstance]);
 
   return <div ref={ref} className="w-full flex justify-center bg-[#EFD09E]/55 p-6 rounded-xl border border-[#D4AA7D]/35 select-none" />;
 };
