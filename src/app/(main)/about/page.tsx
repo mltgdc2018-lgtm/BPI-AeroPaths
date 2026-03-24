@@ -9,12 +9,9 @@ import {
   Compass,
   Database,
   Gauge,
-  Mail,
-  MessageCircleMore,
   ScanSearch,
   ShieldCheck,
   Sparkles,
-  UserRound,
   Workflow,
 } from "lucide-react";
 
@@ -100,12 +97,6 @@ const timeline = [
   },
 ];
 
-const founderProfile = {
-  name: "Vorrapat Weangdonko",
-  title: "Founder & Solo Builder",
-  email: "bksw007@gmail.com",
-  lineId: "bksw0077",
-};
 
 export default function AboutPage() {
   return (
@@ -188,75 +179,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="relative py-6 md:py-10">
-        <div className="container-custom">
-          <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-stretch">
-            <article className="rounded-[2rem] border border-white/80 bg-[#EEF2F6]/94 p-6 shadow-[10px_10px_24px_rgba(166,180,200,0.22),-8px_-8px_20px_rgba(255,255,255,0.88)] md:p-7">
-              <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#7E5C4A]">Founder Profile</p>
-              <div className="mt-6 rounded-[1.8rem] border border-[#D4AA7D]/18 bg-[linear-gradient(160deg,#1E1E1E_0%,#343434_42%,#5A4A41_100%)] p-6 text-[#F6EDDE] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-                <div className="relative mx-auto h-[320px] w-full max-w-[260px] overflow-hidden rounded-[1.5rem] border border-white/10 shadow-[0_18px_34px_rgba(0,0,0,0.28)]">
-                  <Image
-                    src="/images/1773637031822(1).png"
-                    alt="Vorrapat Weangdonko"
-                    fill
-                    priority
-                    sizes="(max-width: 768px) 260px, 260px"
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-black/55 via-black/10 to-transparent" />
-                </div>
-                <p className="mt-5 text-center text-xs leading-6 text-[#F6EDDE]/62">
-                  Founder portrait of Vorrapat Weangdonko.
-                </p>
-              </div>
-            </article>
-
-            <article className="rounded-[2rem] border border-[#7E5C4A]/14 bg-[#F6EDDE]/88 p-7 shadow-[10px_10px_24px_rgba(212,170,125,0.12),-6px_-6px_16px_rgba(255,255,255,0.75)]">
-              <div className="flex items-center gap-3 text-[#7E5C4A]">
-                <UserRound className="h-5 w-5" />
-                <p className="text-[11px] font-bold uppercase tracking-[0.28em]">The Person Behind It</p>
-              </div>
-
-              <h2 className="mt-4 text-3xl font-black leading-tight text-[#272727]">
-                {founderProfile.name}
-              </h2>
-              <p className="mt-2 text-sm font-semibold uppercase tracking-[0.18em] text-[#7E5C4A]">
-                {founderProfile.title}
-              </p>
-
-              <div className="mt-6 space-y-4 text-sm leading-7 text-[#7E5C4A]">
-                <p>
-                  Vorrapat is the solo builder behind BPI AeroPath, shaping the product from workflow logic to
-                  interface polish. The focus is simple: build tools that reduce operational friction and make daily
-                  work easier to review, share, and trust.
-                </p>
-                <p>
-                  The system continues to grow through practical iteration, with each improvement grounded in actual
-                  warehouse, packaging, and reporting needs rather than generic software patterns.
-                </p>
-              </div>
-
-              <div className="mt-8 grid gap-4 md:grid-cols-2">
-                <div className="rounded-[1.4rem] border border-[#D4AA7D]/20 bg-[#EEF2F6]/90 p-4">
-                  <div className="flex items-center gap-2 text-[#7E5C4A]">
-                    <Mail className="h-4 w-4" />
-                    <span className="text-[11px] font-bold uppercase tracking-[0.2em]">Email</span>
-                  </div>
-                  <p className="mt-3 break-all text-base font-bold text-[#272727]">{founderProfile.email}</p>
-                </div>
-
-                <div className="rounded-[1.4rem] border border-[#D4AA7D]/20 bg-[#EEF2F6]/90 p-4">
-                  <div className="flex items-center gap-2 text-[#7E5C4A]">
-                    <MessageCircleMore className="h-4 w-4" />
-                    <span className="text-[11px] font-bold uppercase tracking-[0.2em]">Line ID</span>
-                  </div>
-                  <p className="mt-3 text-base font-bold text-[#272727]">{founderProfile.lineId}</p>
-                </div>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
 
       <section className="relative py-6 md:py-10">
         <div className="container-custom">
