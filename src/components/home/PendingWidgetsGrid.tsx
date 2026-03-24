@@ -314,8 +314,8 @@ function OilPriceWidget() {
 
         if (json.success !== false) {
           const fuelData = Array.isArray(data) ? data : [];
-          let rawList: any[] = [];
-
+          let rawList: { OilName: string; PriceToday: number | string; PriceYesterday?: number | string | null }[] = [];
+          
           if (fuelData.length > 0 && fuelData[0].OilList) {
             const oilListStr = fuelData[0].OilList;
             rawList = typeof oilListStr === 'string' ? JSON.parse(oilListStr) : oilListStr;

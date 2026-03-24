@@ -337,7 +337,7 @@ function OilPriceWidget() {
 
         if (json.success !== false) {
           const fuelData = Array.isArray(data) ? data : [];
-          let rawList: any[] = [];
+          let rawList: { OilName: string; PriceToday: number | string; PriceYesterday?: number | string | null }[] = [];
           
           if (fuelData.length > 0 && fuelData[0].OilList) {
             const oilListStr = fuelData[0].OilList;
@@ -347,8 +347,8 @@ function OilPriceWidget() {
           }
           
           const allFuels: OilPrice[] = rawList
-            .filter((item: any) => item?.OilName && typeof item.OilName === "string")
-            .map((item: any) => {
+            .filter((item) => item?.OilName && typeof item.OilName === "string")
+            .map((item) => {
               const priceToday = parseFloat(String(item.PriceToday)) || 0;
               const priceYesterday = item.PriceYesterday ? parseFloat(String(item.PriceYesterday)) : null;
               const change = priceYesterday === null ? 0 : priceToday - priceYesterday;

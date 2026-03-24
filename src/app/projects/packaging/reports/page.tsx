@@ -109,7 +109,6 @@ interface ShipmentDropdownModalState {
 }
 
 const REPORTS_COLLECTION = "packaging_reports";
-const REPORTS_SOURCE_CSV = "/files/packing_export_2026-02-27_23_update.csv";
 const REPORTS_QUERY_KEY = ["packaging-reports"] as const;
 const REPORTS_FILTER_COOKIE = "packaging_reports_filters";
 const REPORTS_PAGE_SIZE = 80;
@@ -344,134 +343,6 @@ const formatDateForInputDisplay = (value: string): string => {
 const formatTimelineLabel = (date: Date): string =>
   date.toLocaleDateString("th-TH", { day: "numeric", month: "short" });
 
-const splitCsvLine = (line: string): string[] => {
-  const result: string[] = [];
-  let current = "";
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i += 1) {
-    const ch = line[i];
-
-    if (ch === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        current += '"';
-        i += 1;
-      } else {
-        inQuotes = !inQuotes;
-      }
-      continue;
-    }
-
-    if (ch === "," && !inQuotes) {
-      result.push(current);
-      current = "";
-      continue;
-    }
-
-    current += ch;
-  }
-
-  result.push(current);
-  return result;
-};
-
-const parsePackingCsv = (csvText: string): PackingReportRow[] => {
-  const lines = csvText.split(/\r?\n/).filter(Boolean);
-  if (lines.length <= 1) return [];
-
-  const headerCols = splitCsvLine(lines[0]).map((col) => col.trim().toLowerCase());
-  const findColIndex = (header: string, fallback: number) => {
-    const idx = headerCols.indexOf(header.toLowerCase());
-    return idx >= 0 ? idx : fallback;
-  };
-  const readCol = (cols: string[], idx: number) => (idx >= 0 && idx < cols.length ? cols[idx] : "");
-
-  const columnIndex = {
-    date: findColIndex("Date", 0),
-    customerName: findColIndex("Customer Name", 1),
-    consigneeName: findColIndex("Consignee Name", 2),
-    mode: findColIndex("Mode", 3),
-    product: findColIndex("Product", 4),
-    siQty: findColIndex("SI QTY", 5),
-    qty: findColIndex("QTY", 6),
-    qty110x110x115: findColIndex("110x110x115 QTY", 16),
-    qty110x110x90: findColIndex("110x110x90 QTY", 17),
-    qty110x110x65: findColIndex("110x110x65 QTY", 18),
-    qty80x120x115: findColIndex("80X120X115 QTY", 19),
-    qty80x120x90: findColIndex("80X120X90 QTY", 20),
-    qty80x120x65: findColIndex("80X120X65 QTY", 21),
-    qty42x46x68: findColIndex("42X46X68 QTY", 22),
-    qty47x66x68: findColIndex("47X66X68 QTY", 23),
-    qty53x53x58: findColIndex("53X53X58 QTY", 24),
-    qty57x64x84: findColIndex("57X64X84 QTY", 25),
-    qty68x74x86: findColIndex("68X74X86 QTY", 26),
-    qty70x100x90: findColIndex("70X100X90 QTY", 27),
-    qty27x27x22: findColIndex("27X27X22 QTY", 28),
-    qty53x53x19: findColIndex("53X53X19 QTY", 29),
-    warpQty: findColIndex("WARP QTY", 30),
-    unitQty: findColIndex("UNIT QTY", 31),
-    returnableQty: findColIndex("RETURNABLE QTY", 32),
-    remark: findColIndex("Remark", 33),
-  };
-
-  return lines.slice(1).map((line, index) => {
-    const cols = splitCsvLine(line);
-    const customerName = readCol(cols, columnIndex.customerName).trim();
-    const consigneeName = readCol(cols, columnIndex.consigneeName).trim();
-    const transportMode = readCol(cols, columnIndex.mode).trim();
-    const packagingBreakdown: Record<PackagingBreakdownKey, number> = {
-      qty110x110x115: Number(readCol(cols, columnIndex.qty110x110x115)) || 0,
-      qty110x110x90: Number(readCol(cols, columnIndex.qty110x110x90)) || 0,
-      qty110x110x65: Number(readCol(cols, columnIndex.qty110x110x65)) || 0,
-      qty80x120x115: Number(readCol(cols, columnIndex.qty80x120x115)) || 0,
-      qty80x120x90: Number(readCol(cols, columnIndex.qty80x120x90)) || 0,
-      qty80x120x65: Number(readCol(cols, columnIndex.qty80x120x65)) || 0,
-      returnableQty: Number(readCol(cols, columnIndex.returnableQty)) || 0,
-      qty42x46x68: Number(readCol(cols, columnIndex.qty42x46x68)) || 0,
-      qty47x66x68: Number(readCol(cols, columnIndex.qty47x66x68)) || 0,
-      qty53x53x58: Number(readCol(cols, columnIndex.qty53x53x58)) || 0,
-      qty57x64x84: Number(readCol(cols, columnIndex.qty57x64x84)) || 0,
-      qty68x74x86: Number(readCol(cols, columnIndex.qty68x74x86)) || 0,
-      qty70x100x90: Number(readCol(cols, columnIndex.qty70x100x90)) || 0,
-      qty27x27x22: Number(readCol(cols, columnIndex.qty27x27x22)) || 0,
-      qty53x53x19: Number(readCol(cols, columnIndex.qty53x53x19)) || 0,
-      warpQty: Number(readCol(cols, columnIndex.warpQty)) || 0,
-      unitQty: Number(readCol(cols, columnIndex.unitQty)) || 0,
-    };
-    const standardTotal = STANDARD_KEYS.reduce((sum, key) => sum + packagingBreakdown[key], 0);
-    const boxesTotal = BOXES_KEYS.reduce((sum, key) => sum + packagingBreakdown[key], 0);
-    const cartonTotal = CARTON_KEYS.reduce((sum, key) => sum + packagingBreakdown[key], 0);
-    const warpTotal = packagingBreakdown.warpQty + packagingBreakdown.unitQty;
-    const returnableTotal = packagingBreakdown.returnableQty;
-    const totalPackages = Object.values(packagingBreakdown).reduce((sum, qty) => sum + qty, 0);
-
-    return {
-      id: `${index + 1}`,
-      date: normalizeDateToIso(readCol(cols, columnIndex.date)),
-      shipment: consigneeName || "-",
-      mode: transportMode || "-",
-      product: readCol(cols, columnIndex.product) || "-",
-      customerName: customerName || "-",
-      transportMode: transportMode || "-",
-      consigneeName: consigneeName || "-",
-      siQty: Number(readCol(cols, columnIndex.siQty)) || 0,
-      qty: Number(readCol(cols, columnIndex.qty)) || 0,
-      totalPackages,
-      standardTotal,
-      boxesTotal,
-      cartonTotal,
-      warpTotal,
-      returnableTotal,
-      ratioStandard: standardTotal / 1,
-      ratioBoxes: boxesTotal / 3,
-      ratioCarton: cartonTotal / 30,
-      ratioWarp: warpTotal / 10,
-      ratioReturnable: returnableTotal / 2,
-      packagingBreakdown,
-      remark: readCol(cols, columnIndex.remark) || "",
-    };
-  });
-};
 
 const calculatePackagingTotals = (form: AddRecordForm) => {
   const packagingBreakdown = PACKAGING_BREAKDOWN_FIELDS.reduce<Record<PackagingBreakdownKey, number>>(
@@ -661,7 +532,7 @@ const writeReportsCache = async (rows: PackingReportRow[]): Promise<void> => {
 
 const loadReportsFromFirestore = async (): Promise<PackingReportRow[]> => {
   const colRef = collection(db, REPORTS_COLLECTION);
-  let snapshot = await getDocs(colRef);
+  const snapshot = await getDocs(colRef);
 
   if (snapshot.empty) {
     // Database empty, no auto-seeding required since data has been migrated via import script.
