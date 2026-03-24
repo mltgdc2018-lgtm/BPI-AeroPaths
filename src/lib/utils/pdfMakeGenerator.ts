@@ -16,7 +16,7 @@ type PdfFontFamily = {
 type PdfMakeRuntime = {
   addVirtualFileSystem?: (vfs: Record<string, string>) => void;
   addFonts?: (fonts: Record<string, PdfFontFamily>) => void;
-  createPdf: (
+  createPdf?: (
     docDefinition: TDocumentDefinitions,
     tableLayouts?: unknown,
     fonts?: Record<string, PdfFontFamily>,
@@ -367,14 +367,18 @@ export const generatePackingListPDFMake = async (
     },
   };
 
-  const pdfMakeRaw = pdfMake as unknown as PdfMakeRuntime;
-  const pdfMakeRuntime = pdfMakeRaw?.createPdf ? pdfMakeRaw : (pdfMakeRaw as Record<string, unknown>).default || pdfMakeRaw;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pdfMakeRaw = pdfMake as any;
+  const pdfMakeRuntime = (pdfMakeRaw?.createPdf ? pdfMakeRaw : (pdfMakeRaw?.default || pdfMakeRaw)) as PdfMakeRuntime;
 
-  (pdfMakeRuntime as PdfMakeRuntime).addVirtualFileSystem?.(vfs);
-  (pdfMakeRuntime as PdfMakeRuntime).addFonts?.(fonts);
-  (pdfMakeRuntime as PdfMakeRuntime)
-    .createPdf(docDefinition)
-    .download(`PackingPlan_${customerName}_${totalItems}_${filenameTimestamp}.pdf`);
+  pdfMakeRuntime.addVirtualFileSystem?.(vfs);
+  pdfMakeRuntime.addFonts?.(fonts);
+  
+  if (typeof pdfMakeRuntime.createPdf === "function") {
+    pdfMakeRuntime.createPdf(docDefinition).download(`PackingPlan_${customerName}_${totalItems}_${filenameTimestamp}.pdf`);
+  } else {
+    console.error("pdfMake.createPdf is not a function", pdfMakeRuntime);
+  }
 };
 
 // --- Helper Components ---
