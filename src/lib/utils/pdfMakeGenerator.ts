@@ -1,6 +1,6 @@
-// @ts-ignore - Ignore type errors for pdfmake build imports which are often problematic in Next.js
+// @ts-expect-error - Ignore type errors for pdfmake build imports which are often problematic in Next.js
 import pdfMake from "pdfmake/build/pdfmake";
-// @ts-ignore
+// @ts-expect-error
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { PackingPlanResult } from "../services/packing-logic/packing.types";
 import { TDocumentDefinitions, Content, Style, TableCell } from "pdfmake/interfaces";
