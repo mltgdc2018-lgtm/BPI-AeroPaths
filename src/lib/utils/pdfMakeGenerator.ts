@@ -3,10 +3,10 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { PackingPlanResult } from "@/lib/services/packing-logic/packing.types";
-import { TDocumentDefinitions, Content, Style } from "pdfmake/interfaces";
+import { TDocumentDefinitions, Content } from "pdfmake/interfaces";
 
 // ==========================
-// 🔧 FIX 1: Safe Font Loader
+// 🔧 FONT LOADER (FIX PRODUCTION)
 // ==========================
 async function fetchFont(url: string): Promise<string> {
   const res = await fetch(url);
@@ -51,20 +51,19 @@ function buildFonts() {
 }
 
 // ==========================
-// 🚀 MAIN FUNCTION
+// 🚀 MAIN FUNCTION (FINAL)
 // ==========================
 export const generatePackingListPDFMake = async (
   results: PackingPlanResult[],
   customerName: string,
-  poList: string[]
+  poList: string[],
+  totalItemsRequired: number // ✅ FIX: รองรับ 4 args
 ) => {
   try {
-    const now = new Date();
-
     const filename = `PackingPlan_${customerName}_${Date.now()}.pdf`;
 
     // ==========================
-    // 🔧 FIX 2: Load VFS + Fonts
+    // 🔧 LOAD FONT
     // ==========================
     const vfs = await buildVfs();
     const fonts = buildFonts();
@@ -78,59 +77,52 @@ export const generatePackingListPDFMake = async (
     }
 
     // ==========================
-    // 🔧 FIX 3: Safe Logo
+    // 🔧 SAFE LOGO LOAD
     // ==========================
     let logoSvg: string | undefined;
 
     try {
-      const res = await fetch("/images/logo.svg"); // ⚠️ เปลี่ยนชื่อไฟล์แล้ว
+      const res = await fetch("/images/logo.svg");
       if (res.ok) logoSvg = await res.text();
-    } catch (e) {
+    } catch {
       console.warn("Logo load fail");
     }
 
     // ==========================
-    // 📊 SIMPLE CONTENT (Stable)
+    // 📊 CONTENT
     // ==========================
     const content: Content[] = [];
 
     content.push({
       columns: [
-        logoSvg
-          ? { svg: logoSvg, width: 120 }
-          : { text: "" },
-
-        {
-          text: "PACKING PLAN",
-          style: "header",
-          alignment: "center",
-        },
-
-        {
-          text: customerName,
-          alignment: "right",
-          bold: true,
-        },
+        logoSvg ? { svg: logoSvg, width: 120 } : { text: "" },
+        { text: "PACKING PLAN", alignment: "center", bold: true },
+        { text: customerName, alignment: "right", bold: true },
       ],
     });
 
     content.push({
       text: `PO: ${poList.join(", ")}`,
-      margin: [0, 10, 0, 10],
+      margin: [0, 10, 0, 5],
+    });
+
+    // ✅ เพิ่ม totalItemsRequired
+    content.push({
+      text: `Total Required: ${totalItemsRequired}`,
+      margin: [0, 0, 0, 10],
     });
 
     // ==========================
-    // 📦 TABLE
+    // 📦 TABLE DATA
     // ==========================
     results.forEach((plan) => {
       content.push({
         text: `PO: ${plan.po}`,
-        style: "section",
+        bold: true,
+        margin: [0, 10, 0, 5],
       });
 
-      const tableBody = [
-        ["#", "Item", "Qty"],
-      ];
+      const tableBody = [["#", "Item", "Qty"]];
 
       plan.cases.forEach((c) => {
         c.items.forEach((it) => {
@@ -148,33 +140,21 @@ export const generatePackingListPDFMake = async (
           widths: ["auto", "*", "auto"],
           body: tableBody,
         },
-        margin: [0, 5, 0, 15],
       });
     });
 
     // ==========================
-    // 📄 DOC
+    // 📄 DOC CONFIG
     // ==========================
     const docDefinition: TDocumentDefinitions = {
       content,
       defaultStyle: {
         font: "Sarabun",
       },
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-        },
-        section: {
-          fontSize: 12,
-          bold: true,
-          margin: [0, 10, 0, 5],
-        },
-      },
     };
 
     // ==========================
-    // 🔥 FIX 4: FORCE DOWNLOAD
+    // 🔥 DOWNLOAD
     // ==========================
     pdfMake.createPdf(docDefinition).download(filename);
 
