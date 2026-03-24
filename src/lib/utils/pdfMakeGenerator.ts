@@ -1,6 +1,8 @@
-// @ts-expect-error - Ignore type errors for pdfmake build imports which are often problematic in Next.js
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import pdfMake from "pdfmake/build/pdfmake";
-// @ts-expect-error
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { PackingPlanResult } from "../services/packing-logic/packing.types";
 import { TDocumentDefinitions, Content, Style, TableCell } from "pdfmake/interfaces";
