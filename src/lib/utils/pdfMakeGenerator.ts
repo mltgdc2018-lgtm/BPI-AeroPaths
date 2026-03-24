@@ -6,7 +6,23 @@ import { PackingPlanResult } from "@/lib/services/packing-logic/packing.types";
 import { TDocumentDefinitions, Content } from "pdfmake/interfaces";
 
 // ==========================
-// 🔧 FONT LOADER (FIX PRODUCTION)
+// ✅ TYPE SAFE (แทน any)
+// ==========================
+type PdfMakeWithExt = typeof pdfMake & {
+  vfs?: Record<string, string>;
+  fonts?: Record<string, unknown>;
+  addVirtualFileSystem?: (vfs: Record<string, string>) => void;
+  addFonts?: (fonts: Record<string, unknown>) => void;
+};
+
+type PdfFontsType = {
+  pdfMake?: {
+    vfs?: Record<string, string>;
+  };
+};
+
+// ==========================
+// 🔧 FONT LOADER
 // ==========================
 async function fetchFont(url: string): Promise<string> {
   const res = await fetch(url);
@@ -14,20 +30,22 @@ async function fetchFont(url: string): Promise<string> {
 
   const buffer = await res.arrayBuffer();
   const bytes = new Uint8Array(buffer);
+
   let binary = "";
   bytes.forEach((b) => (binary += String.fromCharCode(b)));
 
   return btoa(binary);
 }
 
-async function buildVfs() {
+async function buildVfs(): Promise<Record<string, string>> {
   try {
     const sarabun = await fetchFont(
       `${window.location.origin}/fonts/Sarabun-Regular.ttf`
     );
 
     const baseVfs =
-      (pdfFonts as any)?.pdfMake?.vfs || (pdfFonts as any);
+      (pdfFonts as PdfFontsType)?.pdfMake?.vfs ||
+      (pdfFonts as unknown as Record<string, string>);
 
     return {
       ...baseVfs,
@@ -35,11 +53,14 @@ async function buildVfs() {
     };
   } catch (e) {
     console.error("Font error:", e);
-    return (pdfFonts as any)?.pdfMake?.vfs || {};
+    return (
+      (pdfFonts as PdfFontsType)?.pdfMake?.vfs ||
+      {}
+    );
   }
 }
 
-function buildFonts() {
+function buildFonts(): Record<string, unknown> {
   return {
     Sarabun: {
       normal: "Sarabun-Regular.ttf",
@@ -51,33 +72,32 @@ function buildFonts() {
 }
 
 // ==========================
-// 🚀 MAIN FUNCTION (FINAL)
+// 🚀 MAIN FUNCTION
 // ==========================
 export const generatePackingListPDFMake = async (
   results: PackingPlanResult[],
   customerName: string,
   poList: string[],
-  totalItemsRequired: number // ✅ FIX: รองรับ 4 args
+  totalItemsRequired: number
 ) => {
   try {
     const filename = `PackingPlan_${customerName}_${Date.now()}.pdf`;
 
-    // ==========================
-    // 🔧 LOAD FONT
-    // ==========================
     const vfs = await buildVfs();
     const fonts = buildFonts();
 
-    if ((pdfMake as any).addVirtualFileSystem) {
-      (pdfMake as any).addVirtualFileSystem(vfs);
-      (pdfMake as any).addFonts(fonts);
+    const pdfMakeExt = pdfMake as PdfMakeWithExt;
+
+    if (pdfMakeExt.addVirtualFileSystem && pdfMakeExt.addFonts) {
+      pdfMakeExt.addVirtualFileSystem(vfs);
+      pdfMakeExt.addFonts(fonts);
     } else {
-      (pdfMake as any).vfs = vfs;
-      (pdfMake as any).fonts = fonts;
+      pdfMakeExt.vfs = vfs;
+      pdfMakeExt.fonts = fonts;
     }
 
     // ==========================
-    // 🔧 SAFE LOGO LOAD
+    // LOGO
     // ==========================
     let logoSvg: string | undefined;
 
@@ -89,7 +109,7 @@ export const generatePackingListPDFMake = async (
     }
 
     // ==========================
-    // 📊 CONTENT
+    // CONTENT
     // ==========================
     const content: Content[] = [];
 
@@ -106,15 +126,11 @@ export const generatePackingListPDFMake = async (
       margin: [0, 10, 0, 5],
     });
 
-    // ✅ เพิ่ม totalItemsRequired
     content.push({
       text: `Total Required: ${totalItemsRequired}`,
       margin: [0, 0, 0, 10],
     });
 
-    // ==========================
-    // 📦 TABLE DATA
-    // ==========================
     results.forEach((plan) => {
       content.push({
         text: `PO: ${plan.po}`,
@@ -122,14 +138,16 @@ export const generatePackingListPDFMake = async (
         margin: [0, 10, 0, 5],
       });
 
-      const tableBody = [["#", "Item", "Qty"]];
+      const tableBody: (string | number)[][] = [
+        ["#", "Item", "Qty"],
+      ];
 
       plan.cases.forEach((c) => {
         c.items.forEach((it) => {
           tableBody.push([
-            c.caseNo.toString(),
+            c.caseNo,
             it.sku,
-            it.qty.toString(),
+            it.qty,
           ]);
         });
       });
@@ -143,9 +161,6 @@ export const generatePackingListPDFMake = async (
       });
     });
 
-    // ==========================
-    // 📄 DOC CONFIG
-    // ==========================
     const docDefinition: TDocumentDefinitions = {
       content,
       defaultStyle: {
@@ -153,9 +168,6 @@ export const generatePackingListPDFMake = async (
       },
     };
 
-    // ==========================
-    // 🔥 DOWNLOAD
-    // ==========================
     pdfMake.createPdf(docDefinition).download(filename);
 
   } catch (error) {
