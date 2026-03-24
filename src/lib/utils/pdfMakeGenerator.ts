@@ -2,17 +2,21 @@
 
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import {
+  TDocumentDefinitions,
+  Content,
+  TFontDictionary,
+} from "pdfmake/interfaces";
 import { PackingPlanResult } from "@/lib/services/packing-logic/packing.types";
-import { TDocumentDefinitions, Content } from "pdfmake/interfaces";
 
 // ==========================
-// ✅ TYPE SAFE (แทน any)
+// ✅ TYPE SAFE EXTENSION
 // ==========================
-type PdfMakeWithExt = typeof pdfMake & {
+type PdfMakeExtended = typeof pdfMake & {
   vfs?: Record<string, string>;
-  fonts?: Record<string, unknown>;
+  fonts?: TFontDictionary;
   addVirtualFileSystem?: (vfs: Record<string, string>) => void;
-  addFonts?: (fonts: Record<string, unknown>) => void;
+  addFonts?: (fonts: TFontDictionary) => void;
 };
 
 type PdfFontsType = {
@@ -53,14 +57,11 @@ async function buildVfs(): Promise<Record<string, string>> {
     };
   } catch (e) {
     console.error("Font error:", e);
-    return (
-      (pdfFonts as PdfFontsType)?.pdfMake?.vfs ||
-      {}
-    );
+    return (pdfFonts as PdfFontsType)?.pdfMake?.vfs || {};
   }
 }
 
-function buildFonts(): Record<string, unknown> {
+function buildFonts(): TFontDictionary {
   return {
     Sarabun: {
       normal: "Sarabun-Regular.ttf",
@@ -86,8 +87,11 @@ export const generatePackingListPDFMake = async (
     const vfs = await buildVfs();
     const fonts = buildFonts();
 
-    const pdfMakeExt = pdfMake as PdfMakeWithExt;
+    const pdfMakeExt = pdfMake as PdfMakeExtended;
 
+    // ==========================
+    // ✅ SAFE FONT SETUP
+    // ==========================
     if (pdfMakeExt.addVirtualFileSystem && pdfMakeExt.addFonts) {
       pdfMakeExt.addVirtualFileSystem(vfs);
       pdfMakeExt.addFonts(fonts);
@@ -97,7 +101,7 @@ export const generatePackingListPDFMake = async (
     }
 
     // ==========================
-    // LOGO
+    // 🔧 LOGO
     // ==========================
     let logoSvg: string | undefined;
 
@@ -109,7 +113,7 @@ export const generatePackingListPDFMake = async (
     }
 
     // ==========================
-    // CONTENT
+    // 📊 CONTENT
     // ==========================
     const content: Content[] = [];
 
@@ -131,6 +135,9 @@ export const generatePackingListPDFMake = async (
       margin: [0, 0, 0, 10],
     });
 
+    // ==========================
+    // 📦 TABLE
+    // ==========================
     results.forEach((plan) => {
       content.push({
         text: `PO: ${plan.po}`,
@@ -161,6 +168,9 @@ export const generatePackingListPDFMake = async (
       });
     });
 
+    // ==========================
+    // 📄 DOC
+    // ==========================
     const docDefinition: TDocumentDefinitions = {
       content,
       defaultStyle: {
@@ -168,6 +178,9 @@ export const generatePackingListPDFMake = async (
       },
     };
 
+    // ==========================
+    // 🔥 DOWNLOAD
+    // ==========================
     pdfMake.createPdf(docDefinition).download(filename);
 
   } catch (error) {
