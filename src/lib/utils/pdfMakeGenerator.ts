@@ -32,20 +32,22 @@ async function fetchFont(url: string): Promise<string> {
   const res = await fetch(url);
   if (!res.ok) throw new Error("Font load failed");
 
-  const buffer = await res.arrayBuffer();
-  const bytes = new Uint8Array(buffer);
-
-  let binary = "";
-  bytes.forEach((b) => (binary += String.fromCharCode(b)));
-
-  return btoa(binary);
+  const blob = await res.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      const base64 = dataUrl.split(",")[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
 }
 
 async function buildVfs(): Promise<Record<string, string>> {
   try {
-    const sarabun = await fetchFont(
-      `${window.location.origin}/fonts/Sarabun-Regular.ttf`
-    );
+    const sarabun = await fetchFont("/fonts/Sarabun-Regular.ttf");
 
     const baseVfs =
       (pdfFonts as PdfFontsType)?.pdfMake?.vfs ||
@@ -106,8 +108,13 @@ export const generatePackingListPDFMake = async (
     let logoSvg: string | undefined;
 
     try {
-      const res = await fetch("/images/logo.svg");
-      if (res.ok) logoSvg = await res.text();
+      const res = await fetch("/images/Logo%20no%20bg.svg");
+      if (res.ok) {
+        const text = await res.text();
+        if (text.includes("<svg")) {
+          logoSvg = text;
+        }
+      }
     } catch {
       console.warn("Logo load fail");
     }
@@ -152,9 +159,9 @@ export const generatePackingListPDFMake = async (
       plan.cases.forEach((c) => {
         c.items.forEach((it) => {
           tableBody.push([
-            c.caseNo,
-            it.sku,
-            it.qty,
+            String(c.caseNo),
+            String(it.sku),
+            String(it.qty),
           ]);
         });
       });
