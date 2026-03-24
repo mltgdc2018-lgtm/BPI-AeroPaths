@@ -499,7 +499,7 @@ export default function PackagingBookingPage() {
     }));
   };
 
-  const handleExportPDF = async () => {
+  const handleDownload = async () => {
     if (!planResult.length || !selectedCustomer || isExportingPlan) return;
     if (validationResult.errors.length > 0) {
       alert("Please resolve validation errors before exporting PDF.");
@@ -508,29 +508,22 @@ export default function PackagingBookingPage() {
 
     setIsExportingPlan(true);
     const pdfData = buildPackingPlanPdfData();
-    const poList = planResult.map(p => p.po);
-
-    // Calculate Total Items Required from Raw Input
-    let totalItemsRequired = 0;
-    if (activeStep >= 3 && rawData) {
-       // Re-parse raw data to get total required
-       // Assuming rawData format: PO, SKU, QTY
-       const lines = rawData.split("\n");
-       lines.forEach(line => {
-           const parts = line.trim().split(/[\t,]+/);
-           if (parts.length >= 3) {
-               const qty = parseInt(parts[2].replace(/,/g, "").trim());
-               if (!isNaN(qty)) totalItemsRequired += qty;
-           }
-       });
-    }
+    const poList = planResult.map((p) => p.po);
+    const totalItemsRequired = planSummary?.totalItems || 0;
 
     try {
-      const { generatePackingListPDFMake } = await import("@/lib/utils/pdfMakeGenerator");
-      await generatePackingListPDFMake(pdfData, selectedCustomer.code, poList, totalItemsRequired);
+      const { generatePackingListPDFMake } = await import(
+        "@/lib/utils/pdfMakeGenerator"
+      );
+      await generatePackingListPDFMake(
+        pdfData,
+        selectedCustomer.code,
+        poList,
+        totalItemsRequired
+      );
     } catch (error) {
       console.error("PDF export failed.", error);
-      alert("Failed to generate PDF. Please try again.");
+      alert("Failed to generate PDF.");
     } finally {
       setIsExportingPlan(false);
     }
@@ -1219,7 +1212,7 @@ export default function PackagingBookingPage() {
                                   </button>
                                   
                                   <button 
-                                      onClick={handleExportPDF}
+                                      onClick={handleDownload}
                                       disabled={isExportingPlan || validationResult.errors.length > 0}
                                       className="flex flex-col items-center justify-center gap-3 p-6 bg-[#EFD09E]/40 border-2 border-[#D4AA7D]/35 rounded-2xl hover:border-[#272727] hover:bg-[#272727] transition-all group"
                                   >
@@ -1629,7 +1622,7 @@ export default function PackagingBookingPage() {
              </div>
              
              <button 
-                onClick={handleExportPDF}
+                onClick={handleDownload}
                 disabled={isExportingPlan}
                 className="w-full py-3 bg-[#272727] text-[#EFD09E] font-bold rounded-xl hover:bg-[#3A374F] shadow-lg shadow-[#272727]/25 border border-[#EFD09E]/20 transition-all flex items-center justify-center gap-2"
              >
