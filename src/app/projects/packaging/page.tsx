@@ -60,12 +60,7 @@ const sections = [
     href: "/projects/packaging/analysis",
     icon: PieChart,
   },
-  {
-    title: "Raw Material Balance",
-    description: "จัดการวัตถุดิบ — รับเข้า, ใช้ไป, คงเหลือ พร้อมระบบ FIFO",
-    href: "/projects/packaging/raw-material-balance",
-    icon: Boxes,
-  },
+
   {
     title: "Logic Process",
     description: "Visualize and debug algorithm decisions with a step-by-step process view.",

@@ -106,7 +106,7 @@ function pkgKeyToBomId(key: string): string {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function RawMaterialBalancePage() {
+export function RawMaterialBalanceView() {
   // ── Data State ────────────────────────────────────────────────────────────
   const [activeTab, setActiveTab] = useState<TabKey>("receiving");
   const [receivingTx, setReceivingTx] = useState<RawMaterialTransaction[]>([]);
@@ -410,17 +410,9 @@ export default function RawMaterialBalancePage() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen pt-20 bg-[#F6EDDE] relative overflow-hidden">
-      <div className="absolute top-24 -left-16 w-72 h-72 bg-[#D4AA7D]/15 rounded-full blur-3xl" />
-      <div className="absolute bottom-16 -right-16 w-80 h-80 bg-[#EFD09E]/25 rounded-full blur-3xl" />
-      <section className="py-12 md:py-16">
-        <div className="container-custom relative z-10">
-          <ModuleHeader
-            title="Raw Material Balance"
-            description="จัดการวัตถุดิบ — รับเข้า (Manual), ใช้ไป (Auto จาก Packing × BOM), คงเหลือ"
-          >
-            <div className="space-y-6 mt-8">
-              {/* ─── Summary Cards ──────────────────────────────────── */}
+    <>
+      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-400">
+        {/* ─── Summary Cards ──────────────────────────────────── */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <GlassCard className="p-4 flex items-center justify-between bg-[#EEF2F6]/95 border border-white/80 shadow-[8px_8px_18px_rgba(166,180,200,0.28),-8px_-8px_18px_rgba(255,255,255,0.92)] hover:bg-[#272727] group transition-all duration-300">
                   <div>
@@ -753,10 +745,7 @@ export default function RawMaterialBalancePage() {
                   </div>
                 </GlassCard>
               )}
-            </div>
-          </ModuleHeader>
-
-          {/* ─── Add Receiving Modal ──────────────────────────────── */}
+        </div>
           <Modal
             isOpen={showAddModal}
             onClose={() => setShowAddModal(false)}
@@ -850,9 +839,7 @@ export default function RawMaterialBalancePage() {
                 </button>
               </div>
             </div>
-          </Modal>
-        </div>
-      </section>
-    </div>
+      </Modal>
+    </>
   );
 }
