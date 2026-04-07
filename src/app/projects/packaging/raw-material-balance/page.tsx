@@ -227,6 +227,18 @@ export default function RawMaterialBalancePage() {
     return rows;
   }, [packingReports, bomById, rawMaterials, filterYear, filterMonth, filterJob, searchValue]);
 
+  // ── Aggregated filtered usage per material ────────────────────────────────
+  const filteredUsageTotals = useMemo(() => {
+    const totals: Record<string, { qty: number; unit: string }> = {};
+    usageRows.forEach(row => {
+      if (!totals[row.materialName]) totals[row.materialName] = { qty: 0, unit: row.unit };
+      totals[row.materialName].qty += row.qty;
+    });
+    return Object.entries(totals)
+      .map(([name, info]) => ({ materialName: name, ...info }))
+      .sort((a, b) => b.qty - a.qty);
+  }, [usageRows]);
+
   // ── Aggregated usage per material (for Inventory) ─────────────────────────
   const usageTotals = useMemo(() => {
     const totals: Record<string, { qty: number; unit: string }> = {};
@@ -579,6 +591,26 @@ export default function RawMaterialBalancePage() {
               ) : activeTab === "usage" ? (
                 /* ─── USAGE TAB (Auto from Packing×BOM) ──────── */
                 <GlassCard className="overflow-hidden bg-[#EEF2F6]/95 border border-white/80 shadow-[8px_8px_18px_rgba(166,180,200,0.28),-8px_-8px_18px_rgba(255,255,255,0.92)]">
+                  {filteredUsageTotals.length > 0 && (
+                    <div className="p-4 bg-white/40 border-b border-[#D4AA7D]/15">
+                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#7E5C4A] mb-3">Usage Summary (Filtered)</h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                        {filteredUsageTotals.map(t => (
+                          <div key={t.materialName} className="p-3 bg-white/80 rounded-xl border border-white/60 shadow-sm flex flex-col gap-1 items-start">
+                            <span className="text-[10px] font-bold text-[#8C9AAA] uppercase line-clamp-1 truncate w-full" title={t.materialName}>
+                              {t.materialName}
+                            </span>
+                            <div className="flex items-baseline gap-1.5 mt-0.5">
+                              <span className="text-xl font-black text-rose-600 tabular-nums">
+                                {t.qty.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                              </span>
+                              <span className="text-[10px] font-bold text-[#8C9AAA] uppercase">{unitLabel(t.unit)}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
                       <thead className="bg-[#D4AA7D] text-[#272727] border-b border-[#7E5C4A]/25">
