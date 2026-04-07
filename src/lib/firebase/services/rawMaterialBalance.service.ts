@@ -70,12 +70,11 @@ export const RawMaterialBalanceService = {
   // ✅ Add Usage Record with FIFO auto-deduction
   addUsage: async (data: Omit<RawMaterialTransaction, 'id' | 'type' | 'createdAt' | 'lotId'>) => {
     try {
-      // 1. Get all receiving lots for this material, ordered by date (FIFO)
+      // 1. Get all receiving lots for this material, then sort locally (FIFO)
       const lotsQuery = query(
         collection(db, COLLECTION),
         where('type', '==', 'receiving'),
-        where('materialName', '==', data.materialName),
-        orderBy('date', 'asc'),
+        where('materialName', '==', data.materialName)
       );
       const lotsSnap = await getDocs(lotsQuery);
       const receivingLots: { id: string; date: string; jobOrder: string; qty: number }[] = [];
@@ -83,6 +82,8 @@ export const RawMaterialBalanceService = {
         const lot = d.data();
         receivingLots.push({ id: d.id, date: lot.date, jobOrder: lot.jobOrder || '', qty: lot.qty });
       });
+      // Sort locally by date ascending
+      receivingLots.sort((a, b) => a.date.localeCompare(b.date));
 
       // 2. Get all existing usage for this material
       const usageQuery = query(
@@ -150,7 +151,7 @@ export const RawMaterialBalanceService = {
     materialName?: string;
   }) => {
     try {
-      let q = query(collection(db, COLLECTION), orderBy('date', 'desc'));
+      let q = query(collection(db, COLLECTION));
 
       if (filters?.type) {
         q = query(q, where('type', '==', filters.type));
@@ -188,6 +189,9 @@ export const RawMaterialBalanceService = {
           d.materialName.toLowerCase().includes(filters.materialName!.toLowerCase())
         );
       }
+
+      // Local sort by date descending to avoid requiring a composite index in Firestore
+      data.sort((a, b) => b.date.localeCompare(a.date));
 
       return { data, error: null };
     } catch (error) {

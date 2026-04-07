@@ -125,9 +125,8 @@ export default function RawMaterialBalancePage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [formDate, setFormDate] = useState(new Date().toISOString().slice(0, 10));
   const [formJobOrder, setFormJobOrder] = useState("");
-  const [formMaterial, setFormMaterial] = useState("");
-  const [formQty, setFormQty] = useState("");
-  const [formUnit, setFormUnit] = useState<"pc" | "m">("pc");
+  const [formJobOrder, setFormJobOrder] = useState("");
+  const [formQuantities, setFormQuantities] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
 
   // Delete confirm
@@ -325,16 +324,31 @@ export default function RawMaterialBalancePage() {
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   const handleAdd = async () => {
-    if (!formMaterial || !formQty) return;
+    const itemsToSave = Object.entries(formQuantities)
+      .filter(([name, qtyStr]) => parseFloat(qtyStr) > 0)
+      .map(([name, qtyStr]) => {
+        const mat = rawMaterials.find(m => m.name === name);
+        return {
+          materialName: name,
+          qty: parseFloat(qtyStr),
+          unit: mat?.unit === "m" ? "m" : "pc" as "pc" | "m",
+        };
+      });
+
+    if (itemsToSave.length === 0) return;
+
     setSaving(true);
-    await RawMaterialBalanceService.addReceiving({
-      date: formDate,
-      jobOrder: formJobOrder,
-      materialName: formMaterial,
-      qty: parseFloat(formQty),
-      unit: formUnit,
-      createdBy: "admin",
-    });
+    await Promise.all(itemsToSave.map(item => 
+      RawMaterialBalanceService.addReceiving({
+        date: formDate,
+        jobOrder: formJobOrder,
+        materialName: item.materialName,
+        qty: item.qty,
+        unit: item.unit,
+        createdBy: "admin",
+      })
+    ));
+
     setSaving(false);
     setShowAddModal(false);
     resetForm();
@@ -351,9 +365,7 @@ export default function RawMaterialBalancePage() {
   const resetForm = () => {
     setFormDate(new Date().toISOString().slice(0, 10));
     setFormJobOrder("");
-    setFormMaterial("");
-    setFormQty("");
-    setFormUnit("pc");
+    setFormQuantities({});
   };
 
   // ── Tab Config ────────────────────────────────────────────────────────────
@@ -730,38 +742,33 @@ export default function RawMaterialBalancePage() {
                   className="w-full px-3 py-2 bg-[#EEF2F6]/80 border border-white/80 rounded-lg text-sm text-[#272727] focus:outline-none focus:ring-2 focus:ring-[#9ACD32]/20" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#7E5C4A] uppercase">Description (Raw Material)</label>
-                {rawMaterials.length > 0 ? (
-                  <select value={formMaterial}
-                    onChange={e => {
-                      setFormMaterial(e.target.value);
-                      const mat = rawMaterials.find(m => m.name === e.target.value);
-                      if (mat) setFormUnit(mat.unit === "m" ? "m" : "pc");
-                    }}
-                    className="w-full px-3 py-2 bg-[#EEF2F6]/80 border border-white/80 rounded-lg text-sm text-[#272727] focus:outline-none focus:ring-2 focus:ring-[#9ACD32]/20">
-                    <option value="">Select Material...</option>
-                    {rawMaterials.map(m => (
-                      <option key={m.id} value={m.name}>{m.name} ({unitLabel(m.unit)})</option>
-                    ))}
-                  </select>
-                ) : (
-                  <input type="text" placeholder="Material Name" value={formMaterial} onChange={e => setFormMaterial(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#EEF2F6]/80 border border-white/80 rounded-lg text-sm text-[#272727] focus:outline-none focus:ring-2 focus:ring-[#9ACD32]/20" />
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-[#7E5C4A] uppercase">QTY</label>
-                  <input type="number" step="0.01" min="0" placeholder="0" value={formQty} onChange={e => setFormQty(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#EEF2F6]/80 border border-white/80 rounded-lg text-sm text-[#272727] focus:outline-none focus:ring-2 focus:ring-[#9ACD32]/20" />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-[#7E5C4A] uppercase">Unit</label>
-                  <select value={formUnit} onChange={e => setFormUnit(e.target.value as "pc" | "m")}
-                    className="w-full px-3 py-2 bg-[#EEF2F6]/80 border border-white/80 rounded-lg text-sm text-[#272727] focus:outline-none focus:ring-2 focus:ring-[#9ACD32]/20">
-                    <option value="pc">Pc</option>
-                    <option value="m">M (Meter)</option>
-                  </select>
+                <label className="text-xs font-semibold text-[#7E5C4A] uppercase">Raw Materials</label>
+                <div className="max-h-60 overflow-y-auto border border-[#E8DCC9] rounded-lg">
+                  <table className="w-full text-sm text-left">
+                    <thead className="bg-[#EEF2F6] sticky top-0 border-b border-[#E8DCC9] z-10">
+                      <tr>
+                        <th className="px-3 py-2 font-bold text-xs text-[#7E5C4A]">Material</th>
+                        <th className="px-3 py-2 font-bold text-xs text-[#7E5C4A] text-right w-28">QTY</th>
+                        <th className="px-3 py-2 font-bold text-xs text-[#7E5C4A] text-center w-16">Unit</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rawMaterials.length === 0 ? (
+                        <tr><td colSpan={3} className="px-3 py-8 text-center text-[#7E5C4A]/60">No materials found</td></tr>
+                      ) : rawMaterials.map(m => (
+                        <tr key={m.id} className="border-b border-[#E8DCC9]/50 last:border-0 hover:bg-[#FDF6EC]">
+                          <td className="px-3 py-2 text-[#272727] font-medium">{m.name}</td>
+                          <td className="px-3 py-1.5">
+                            <input type="number" step="0.01" min="0" placeholder="0" 
+                              value={formQuantities[m.name] || ""} 
+                              onChange={e => setFormQuantities(prev => ({ ...prev, [m.name]: e.target.value }))}
+                              className="w-full px-2 py-1 bg-white border border-[#D4AA7D]/50 rounded text-right text-[#272727] focus:outline-none focus:ring-1 focus:ring-[#9ACD32]" />
+                          </td>
+                          <td className="px-3 py-2 text-center text-[10px] font-bold text-[#8C9AAA] uppercase">{unitLabel(m.unit)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
               <div className="pt-4 border-t border-[#D4AA7D]/25 flex gap-3">
@@ -769,7 +776,7 @@ export default function RawMaterialBalancePage() {
                   className="flex-1 py-2.5 bg-[#EEF2F6] border border-white/80 text-[#7E5C4A] hover:bg-white rounded-lg font-medium transition-colors">
                   Cancel
                 </button>
-                <button onClick={handleAdd} disabled={saving || !formMaterial || !formQty}
+                <button onClick={handleAdd} disabled={saving || Object.values(formQuantities).every(q => !parseFloat(q))}
                   className="flex-1 py-2.5 bg-[#272727] hover:bg-[#1f1f1f] text-[#EFD09E] rounded-lg font-medium transition-colors shadow-lg shadow-[#272727]/25 border border-[#EFD09E]/20 disabled:opacity-50 disabled:cursor-not-allowed">
                   {saving ? "Saving..." : "Save"}
                 </button>
