@@ -13,12 +13,29 @@ import { ActivityService, ActivityLog } from "@/lib/firebase/services/activity.s
 export default function ActivityPage() {
   const [activities, setActivities] = useState<ActivityLog[]>([]);
   const [searchValue, setSearchValue] = useState("");
-  const [filterYear, setFilterYear] = useState("All");
+  const [filterYear, setFilterYear] = useState(new Date().getFullYear().toString());
+  const [filterMonth, setFilterMonth] = useState("All");
   const [selectedActivity, setSelectedActivity] = useState<ActivityLog | null>(null);
+
+  const MONTHS = [
+    { value: "All", label: "All Months" },
+    { value: "0", label: "January" },
+    { value: "1", label: "February" },
+    { value: "2", label: "March" },
+    { value: "3", label: "April" },
+    { value: "4", label: "May" },
+    { value: "5", label: "June" },
+    { value: "6", label: "July" },
+    { value: "7", label: "August" },
+    { value: "8", label: "September" },
+    { value: "9", label: "October" },
+    { value: "10", label: "November" },
+    { value: "11", label: "December" },
+  ];
 
   useEffect(() => {
     const fetchActivities = async () => {
-      const { data } = await ActivityService.getRecent(200);
+      const { data } = await ActivityService.getRecent(500); // Fetch more for filtering
       // Ensure all timestamps are Date objects for easier handling
       const normalized = data.map(a => {
         let d: Date;
@@ -174,7 +191,7 @@ export default function ActivityPage() {
               <SearchToolbar
                 searchValue={searchValue}
                 onSearchChange={setSearchValue}
-                searchPlaceholder="Search activities..."
+                searchPlaceholder="Search activities / Job..."
                 filterValue={filterYear}
                 onFilterChange={setFilterYear}
                 primaryButton={{
@@ -182,7 +199,24 @@ export default function ActivityPage() {
                   icon: <Download className="w-4 h-4" />,
                   onClick: () => console.log("Export activities"),
                 }}
-              />
+              >
+                <div className="flex min-w-[150px] flex-col gap-1">
+                  <label className="text-[10px] font-black uppercase tracking-wide text-[#7E5C4A]/80">
+                    Month
+                  </label>
+                  <select
+                    value={filterMonth}
+                    onChange={(event) => setFilterMonth(event.target.value)}
+                    className="px-4 py-2 bg-[#FDF6EC] border border-[#E8DCC9] rounded-lg text-sm text-[#7E5C4A] hover:bg-[#F6EDDE] transition-colors outline-none focus:ring-2 focus:ring-[#D4AA7D]/35 focus:border-[#D4AA7D]/50"
+                  >
+                    {MONTHS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </SearchToolbar>
 
               {/* Data Table */}
               <DataTable

@@ -6,7 +6,7 @@ export type MaterialCategory =
   | "ingredient"
   | "supplies";
 
-export type Unit = "kg" | "g" | "l" | "ml" | "pcs" | "box" | "bag" | "set";
+export type Unit = "kg" | "g" | "l" | "ml" | "pcs" | "box" | "bag" | "set" | "pc" | "m";
 
 export interface Material {
   id: string; // MAT-YYYYMMDD-XXXX

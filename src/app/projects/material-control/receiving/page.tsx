@@ -10,28 +10,12 @@ import { DateInput } from "@/components/shared/DateInput";
 import { SelectField } from "@/components/shared/SelectField";
 import { Truck, CheckCircle2, Clock, Plus } from "lucide-react";
 import { formatDate } from "@/lib/utils/formatters";
-
-// Types
-interface ReceivingNote {
-  id: string;
-  date: string;
-  poNumber: string;
-  supplier: string;
-  items: number;
-  status: "Pending" | "Verified" | "Completed";
-  receivedBy: string;
-}
-
+import { ReceivingService } from "@/lib/firebase/services/receiving.service";
+import type { ReceivingNote } from "@/lib/firebase/services/receiving.service";
+import { useEffect } from "react";
 export default function ReceivingPage() {
-  // Mock Data
-  const [receivingNotes] = useState<ReceivingNote[]>([
-    { id: "RN-2026-001", date: "2026-01-30", poNumber: "PO-2026-0123", supplier: "ABC Metals Co.", items: 5, status: "Pending", receivedBy: "John Doe" },
-    { id: "RN-2026-002", date: "2026-01-28", poNumber: "PO-2026-0120", supplier: "Thai Steel Ltd.", items: 3, status: "Verified", receivedBy: "Jane Smith" },
-    { id: "RN-2026-003", date: "2026-01-25", poNumber: "PO-2026-0115", supplier: "Global Supplies", items: 8, status: "Completed", receivedBy: "Mike Johnson" },
-    { id: "RN-2025-015", date: "2025-12-15", poNumber: "PO-2025-0450", supplier: "Premium Parts", items: 4, status: "Completed", receivedBy: "Tom Brown" },
-    { id: "RN-2025-014", date: "2025-11-20", poNumber: "PO-2025-0420", supplier: "ABC Metals Co.", items: 6, status: "Completed", receivedBy: "Lisa Chen" },
-    { id: "RN-2025-013", date: "2025-10-08", poNumber: "PO-2025-0380", supplier: "Thai Steel Ltd.", items: 2, status: "Completed", receivedBy: "James Lee" },
-  ]);
+  const [receivingNotes, setReceivingNotes] = useState<ReceivingNote[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // State
   const [searchValue, setSearchValue] = useState("");
@@ -43,14 +27,27 @@ export default function ReceivingPage() {
   const [receiveDate, setReceiveDate] = useState("");
   const [suppliers, setSuppliers] = useState(["ABC Metals Co.", "Thai Steel Ltd.", "Global Supplies", "Premium Parts"]);
   const [selectedSupplier, setSelectedSupplier] = useState("");
+  const [poNumber, setPoNumber] = useState("");
+  const [remarks, setRemarks] = useState("");
+
+  useEffect(() => {
+    fetchReceivingNotes();
+  }, []);
+
+  const fetchReceivingNotes = async () => {
+    setLoading(true);
+    const { data } = await ReceivingService.getAll();
+    setReceivingNotes(data || []);
+    setLoading(false);
+  };
 
   // Table Columns
   const columns: Column<ReceivingNote>[] = [
-    { key: "id", header: "RN No." },
+    { key: "receivingNo", header: "RN No.", render: (val, row) => row.receivingNo || row.id },
     { key: "date", header: "Date", type: "date" },
     { key: "poNumber", header: "PO Number" },
     { key: "supplier", header: "Supplier" },
-    { key: "items", header: "Items", align: "center" },
+    { key: "items", header: "Items", align: "center", render: (val, row) => (row.items ? row.items.length : 0) },
     { 
       key: "status", 
       header: "Status", 
@@ -74,11 +71,12 @@ export default function ReceivingPage() {
 
   // Filter data
   const filteredData = receivingNotes.filter((note) => {
+    const idString = note.receivingNo || note.id || "";
     const matchesSearch = 
-      note.id.toLowerCase().includes(searchValue.toLowerCase()) ||
+      idString.toLowerCase().includes(searchValue.toLowerCase()) ||
       note.poNumber.toLowerCase().includes(searchValue.toLowerCase()) ||
       note.supplier.toLowerCase().includes(searchValue.toLowerCase());
-    const matchesYear = filterYear === "All" || note.date.startsWith(filterYear);
+    const matchesYear = filterYear === "All" || (note.date && note.date.startsWith(filterYear));
     return matchesSearch && matchesYear;
   });
 
@@ -253,7 +251,7 @@ export default function ReceivingPage() {
           <Modal
             isOpen={!!selectedReceiving}
             onClose={() => setSelectedReceiving(null)}
-            title={`Receiving Details: ${selectedReceiving?.id}`}
+            title={`Receiving Details: ${selectedReceiving?.receivingNo || selectedReceiving?.id}`}
             className="md:max-w-2xl"
           >
             <div className="h-[480px] flex flex-col">

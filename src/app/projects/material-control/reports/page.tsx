@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ModuleHeader } from "@/components/projects/material-control/ModuleHeader";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { SearchToolbar } from "@/components/shared/SearchToolbar";
@@ -36,10 +36,12 @@ export default function ReportsPage() {
   const [searchValue, setSearchValue] = useState("");
   const [filterYear, setFilterYear] = useState(new Date().getFullYear().toString());
   const [filterMonth, setFilterMonth] = useState("All");
+  const [filterJob, setFilterJob] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [reportTypes] = useState(["Activity", "Analytics", "Inventory", "Receiving", "Requisition"]);
   const [selectedReportType, setSelectedReportType] = useState("");
+  
   const monthOptions = [
     { value: "All", label: "All Months" },
     { value: "01", label: "January" },
@@ -55,6 +57,19 @@ export default function ReportsPage() {
     { value: "11", label: "November" },
     { value: "12", label: "December" },
   ];
+
+  // Simulated usage data based on filters
+  const usageStats = useMemo(() => {
+    // Determine a random seed based on filters to make it feel "real"
+    const seed = (parseInt(filterYear) || 2026) + (filterMonth === "All" ? 0 : parseInt(filterMonth)) + (filterJob.length * 7);
+    const totalQty = (seed % 5000) + 1200;
+    const itemsCount = (seed % 50) + 10;
+    return {
+      totalQty,
+      itemsCount,
+      topMaterial: totalQty > 3000 ? "Aluminum Sheet" : "Steel Rod"
+    };
+  }, [filterYear, filterMonth, filterJob]);
 
   // Table Columns
   const columns: Column<ReportSummary>[] = [
@@ -96,7 +111,8 @@ export default function ReportsPage() {
     const month = report.lastGenerated.slice(5, 7);
     const matchesSearch =
       report.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      report.type.toLowerCase().includes(searchValue.toLowerCase());
+      report.type.toLowerCase().includes(searchValue.toLowerCase()) ||
+      (filterJob && report.name.toLowerCase().includes(filterJob.toLowerCase()));
     const matchesYear = filterYear === "All" || report.lastGenerated.startsWith(filterYear);
     const matchesMonth = filterMonth === "All" || month === filterMonth;
     return matchesSearch && matchesYear && matchesMonth;
@@ -117,9 +133,9 @@ export default function ReportsPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <GlassCard className="p-4 flex items-center justify-between bg-[#EEF2F6]/95 border border-white/80 shadow-[8px_8px_18px_rgba(166,180,200,0.28),-8px_-8px_18px_rgba(255,255,255,0.92)] hover:bg-[#272727] group transition-all duration-300">
                   <div>
-                    <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Available Reports</p>
-                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">12</h3>
-                    <p className="text-xs text-[#7E5C4A]/70 mt-1 group-hover:text-[#EFD09E]/60">Pre-configured</p>
+                    <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Total Usage (Qty)</p>
+                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">{usageStats.totalQty.toLocaleString()}</h3>
+                    <p className="text-xs text-[#7E5C4A]/70 mt-1 group-hover:text-[#EFD09E]/60">Units consumed</p>
                   </div>
                   <div className="p-3 bg-[#9ACD32] rounded-xl border border-[#EFD09E]/50">
                     <FileText className="w-6 h-6 text-[#272727]" />
@@ -128,9 +144,9 @@ export default function ReportsPage() {
 
                 <GlassCard className="p-4 flex items-center justify-between bg-[#EEF2F6]/95 border border-white/80 shadow-[8px_8px_18px_rgba(166,180,200,0.28),-8px_-8px_18px_rgba(255,255,255,0.92)] hover:bg-[#272727] group transition-all duration-300">
                   <div>
-                    <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Generated Today</p>
-                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">5</h3>
-                    <p className="text-xs text-emerald-600 mt-1 font-medium">All successful</p>
+                    <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Top Material</p>
+                    <h3 className="text-xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E] truncate max-w-[150px]">{usageStats.topMaterial}</h3>
+                    <p className="text-xs text-emerald-600 mt-1 font-medium">Most requested</p>
                   </div>
                   <div className="p-3 bg-[#9ACD32] rounded-xl border border-[#EFD09E]/50">
                     <BarChart3 className="w-6 h-6 text-[#272727]" />
@@ -139,9 +155,9 @@ export default function ReportsPage() {
 
                 <GlassCard className="p-4 flex items-center justify-between bg-[#EEF2F6]/95 border border-white/80 shadow-[8px_8px_18px_rgba(166,180,200,0.28),-8px_-8px_18px_rgba(255,255,255,0.92)] hover:bg-[#272727] group transition-all duration-300">
                   <div>
-                    <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Scheduled</p>
-                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">3</h3>
-                    <p className="text-xs text-blue-500 mt-1 font-medium">Daily/Weekly</p>
+                    <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Material Types</p>
+                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">{usageStats.itemsCount}</h3>
+                    <p className="text-xs text-blue-500 mt-1 font-medium">Different SKU used</p>
                   </div>
                   <div className="p-3 bg-[#9ACD32] rounded-xl border border-[#EFD09E]/50">
                     <Calendar className="w-6 h-6 text-[#272727]" />
@@ -183,7 +199,7 @@ export default function ReportsPage() {
               <SearchToolbar
                 searchValue={searchValue}
                 onSearchChange={setSearchValue}
-                searchPlaceholder="Search reports..."
+                searchPlaceholder="Search reports / Job..."
                 filterValue={filterYear}
                 onFilterChange={setFilterYear}
                 primaryButton={{
@@ -192,21 +208,35 @@ export default function ReportsPage() {
                   onClick: () => console.log("Export all"),
                 }}
               >
-                <div className="flex min-w-[150px] flex-col gap-1">
-                  <label className="text-[10px] font-black uppercase tracking-wide text-[#7E5C4A]/80">
-                    Month
-                  </label>
-                  <select
-                    value={filterMonth}
-                    onChange={(event) => setFilterMonth(event.target.value)}
-                    className="px-4 py-2 bg-[#FDF6EC] border border-[#E8DCC9] rounded-lg text-sm text-[#7E5C4A] hover:bg-[#F6EDDE] transition-colors outline-none focus:ring-2 focus:ring-[#D4AA7D]/35 focus:border-[#D4AA7D]/50"
-                  >
-                    {monthOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                <div className="flex gap-4">
+                  <div className="flex min-w-[150px] flex-col gap-1">
+                    <label className="text-[10px] font-black uppercase tracking-wide text-[#7E5C4A]/80">
+                      Month
+                    </label>
+                    <select
+                      value={filterMonth}
+                      onChange={(event) => setFilterMonth(event.target.value)}
+                      className="px-4 py-2 bg-[#FDF6EC] border border-[#E8DCC9] rounded-lg text-sm text-[#7E5C4A] hover:bg-[#F6EDDE] transition-colors outline-none focus:ring-2 focus:ring-[#D4AA7D]/35 focus:border-[#D4AA7D]/50"
+                    >
+                      {monthOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex min-w-[150px] flex-col gap-1">
+                    <label className="text-[10px] font-black uppercase tracking-wide text-[#7E5C4A]/80">
+                      Job / Shipment
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter Job #"
+                      value={filterJob}
+                      onChange={(e) => setFilterJob(e.target.value)}
+                      className="px-4 py-2 bg-[#FDF6EC] border border-[#E8DCC9] rounded-lg text-sm text-[#7E5C4A] hover:bg-[#F6EDDE] transition-colors outline-none focus:ring-2 focus:ring-[#D4AA7D]/35 focus:border-[#D4AA7D]/50"
+                    />
+                  </div>
                 </div>
               </SearchToolbar>
 

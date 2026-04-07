@@ -10,30 +10,12 @@ import { DateInput } from "@/components/shared/DateInput";
 import { SelectField } from "@/components/shared/SelectField";
 import { Clock, CheckCircle2, AlertCircle, Plus } from "lucide-react";
 import { formatDate } from "@/lib/utils/formatters";
-
-// Types
-interface Requisition {
-  id: string;
-  date: string;
-  requester: string;
-  department: string;
-  items: number;
-  priority: "High" | "Normal";
-  status: "Pending" | "Approved" | "Completed" | "Rejected";
-}
-
+import { RequisitionService } from "@/lib/firebase/services/requisition.service";
+import type { Requisition } from "@/lib/firebase/services/requisition.service";
+import { useEffect } from "react";
 export default function RequisitionPage() {
-  // Mock Data
-  const [requisitions] = useState<Requisition[]>([
-    { id: "REQ-2026-001", date: "2026-01-30", requester: "John Doe", department: "Production", items: 3, priority: "High", status: "Pending" },
-    { id: "REQ-2026-002", date: "2026-01-28", requester: "Jane Smith", department: "Maintenance", items: 1, priority: "Normal", status: "Approved" },
-    { id: "REQ-2026-003", date: "2026-01-25", requester: "Mike Johnson", department: "Assembly", items: 5, priority: "Normal", status: "Completed" },
-    { id: "REQ-2026-004", date: "2026-01-20", requester: "Sarah Wilson", department: "Logistics", items: 2, priority: "High", status: "Rejected" },
-    { id: "REQ-2025-015", date: "2025-12-15", requester: "Tom Brown", department: "Production", items: 4, priority: "Normal", status: "Completed" },
-    { id: "REQ-2025-014", date: "2025-11-28", requester: "Lisa Chen", department: "QC", items: 2, priority: "High", status: "Completed" },
-    { id: "REQ-2025-013", date: "2025-10-10", requester: "James Lee", department: "Maintenance", items: 6, priority: "Normal", status: "Completed" },
-    { id: "REQ-2025-012", date: "2025-08-05", requester: "Emma Davis", department: "Assembly", items: 3, priority: "High", status: "Completed" },
-  ]);
+  const [requisitions, setRequisitions] = useState<Requisition[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // State
   const [searchValue, setSearchValue] = useState("");
@@ -45,10 +27,22 @@ export default function RequisitionPage() {
   const [requiredDate, setRequiredDate] = useState("");
   const [departments, setDepartments] = useState(["Production", "Maintenance", "Logistics", "Assembly"]);
   const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [priority, setPriority] = useState<"Normal" | "Urgent">("Normal");
+
+  useEffect(() => {
+    fetchRequisitions();
+  }, []);
+
+  const fetchRequisitions = async () => {
+    setLoading(true);
+    const { data } = await RequisitionService.getAll();
+    setRequisitions(data || []);
+    setLoading(false);
+  };
 
   // Table Columns
   const columns: Column<Requisition>[] = [
-    { key: "id", header: "Req ID" },
+    { key: "requisitionNo", header: "Req ID", render: (val, row) => row.requisitionNo || row.id },
     { key: "date", header: "Date", type: "date" },
     { key: "requester", header: "Requester" },
     { 
@@ -61,7 +55,7 @@ export default function RequisitionPage() {
         </span>
       )
     },
-    { key: "items", header: "Items", align: "center" },
+    { key: "items", header: "Items", align: "center", render: (val, row) => (row.items ? row.items.length : 0) },
     { 
       key: "priority", 
       header: "Priority", 
@@ -97,10 +91,11 @@ export default function RequisitionPage() {
 
   // Filter data by year
   const filteredData = requisitions.filter((req) => {
+    const idString = req.requisitionNo || req.id || "";
     const matchesSearch = 
-      req.id.toLowerCase().includes(searchValue.toLowerCase()) ||
+      idString.toLowerCase().includes(searchValue.toLowerCase()) ||
       req.requester.toLowerCase().includes(searchValue.toLowerCase());
-    const matchesYear = filterYear === "All" || req.date.startsWith(filterYear);
+    const matchesYear = filterYear === "All" || (req.date && req.date.startsWith(filterYear));
     return matchesSearch && matchesYear;
   });
 
@@ -291,7 +286,7 @@ export default function RequisitionPage() {
           <Modal
             isOpen={!!selectedReq}
             onClose={() => setSelectedReq(null)}
-            title={`Requisition Details: ${selectedReq?.id}`}
+            title={`Requisition Details: ${selectedReq?.requisitionNo || selectedReq?.id}`}
             className="md:max-w-2xl"
           >
             <div className="h-[480px] flex flex-col">

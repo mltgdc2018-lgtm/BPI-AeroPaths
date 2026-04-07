@@ -8,36 +8,29 @@ import { SearchToolbar } from "@/components/shared/SearchToolbar";
 import { DataTable, Column } from "@/components/shared/DataTable";
 import { Package, AlertTriangle, ArrowRightLeft, ReceiptText, Plus } from "lucide-react";
 import { formatDate } from "@/lib/utils/formatters";
-
-// Types
-interface InventoryItem {
-  id: number;
-  partNo: string;
-  description: string;
-  category: string;
-  stock: number;
-  unit: string;
-  lastUpdated: string;
-  location: string;
-}
+import { InventoryService } from "@/lib/firebase/services/inventory.service";
+import type { InventoryItem } from "@/lib/firebase/services/inventory.service";
+import { useEffect } from "react";
 
 export default function InventoryPage() {
-  // Mock Data
-  const inventoryItems: InventoryItem[] = [
-    { id: 1, partNo: "MAT-1001", description: "Aluminum Sheet Grade 1000", category: "Metals", stock: 150, unit: "Sheet", lastUpdated: "2026-01-30", location: "WH-A-01" },
-    { id: 2, partNo: "MAT-1002", description: "Steel Rod 10mm", category: "Metals", stock: 300, unit: "Pcs", lastUpdated: "2026-01-28", location: "WH-A-02" },
-    { id: 3, partNo: "MAT-1003", description: "Titanium Plate Grade 5", category: "Metals", stock: 45, unit: "Sheet", lastUpdated: "2026-01-25", location: "WH-A-03" },
-    { id: 4, partNo: "MAT-1004", description: "Copper Wire 2mm", category: "Metals", stock: 500, unit: "M", lastUpdated: "2026-01-20", location: "WH-B-01" },
-    { id: 5, partNo: "MAT-2001", description: "Hydraulic Seal Kit", category: "Seals", stock: 25, unit: "Set", lastUpdated: "2025-12-15", location: "WH-C-01" },
-    { id: 6, partNo: "MAT-2002", description: "O-Ring Assortment", category: "Seals", stock: 120, unit: "Pcs", lastUpdated: "2025-11-20", location: "WH-C-02" },
-    { id: 7, partNo: "MAT-3001", description: "Aircraft Rivet AN470", category: "Fasteners", stock: 2500, unit: "Pcs", lastUpdated: "2025-10-10", location: "WH-D-01" },
-    { id: 8, partNo: "MAT-3002", description: "Hex Bolt M8x25", category: "Fasteners", stock: 800, unit: "Pcs", lastUpdated: "2025-08-05", location: "WH-D-02" },
-  ];
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "history">("overview");
   const [searchValue, setSearchValue] = useState("");
   const [filterYear, setFilterYear] = useState(new Date().getFullYear().toString());
+
+  useEffect(() => {
+    fetchInventory();
+  }, []);
+
+  const fetchInventory = async () => {
+    setLoading(true);
+    const { data } = await InventoryService.getAll();
+    setInventoryItems(data || []);
+    setLoading(false);
+  };
 
   // Table Columns
   const columns: Column<InventoryItem>[] = [
@@ -63,7 +56,10 @@ export default function InventoryPage() {
     const matchesSearch = 
       item.partNo.toLowerCase().includes(searchValue.toLowerCase()) ||
       item.description.toLowerCase().includes(searchValue.toLowerCase());
-    const matchesYear = filterYear === "All" || item.lastUpdated.startsWith(filterYear);
+    
+    // We will need to check item.updatedAt for date-based filter
+    const lastUpdateDate = item.updatedAt ? new Date(item.updatedAt as any).toISOString() : "";
+    const matchesYear = filterYear === "All" || lastUpdateDate.startsWith(filterYear);
     return matchesSearch && matchesYear;
   });
 
@@ -83,8 +79,8 @@ export default function InventoryPage() {
                 <GlassCard className="p-4 flex items-center justify-between bg-[#EEF2F6]/95 border border-white/80 shadow-[8px_8px_18px_rgba(166,180,200,0.28),-8px_-8px_18px_rgba(255,255,255,0.92)] hover:bg-[#272727] group transition-all duration-300">
                   <div>
                     <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Total Items</p>
-                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">1,248</h3>
-                    <p className="text-xs text-[#7E5C4A]/70 mt-1 group-hover:text-[#EFD09E]/60">In 12 categories</p>
+                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">{inventoryItems.length}</h3>
+                    <p className="text-xs text-[#7E5C4A]/70 mt-1 group-hover:text-[#EFD09E]/60">Products mapped</p>
                   </div>
                   <div className="p-3 bg-[#9ACD32] rounded-xl border border-[#EFD09E]/50">
                     <Package className="w-6 h-6 text-[#272727]" />
@@ -94,7 +90,9 @@ export default function InventoryPage() {
                 <GlassCard className="p-4 flex items-center justify-between bg-[#EEF2F6]/95 border border-white/80 shadow-[8px_8px_18px_rgba(166,180,200,0.28),-8px_-8px_18px_rgba(255,255,255,0.92)] hover:bg-[#272727] group transition-all duration-300">
                   <div>
                     <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Low Stock</p>
-                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">15</h3>
+                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">
+                      {inventoryItems.filter(item => item.minStock !== undefined && item.stock <= item.minStock).length}
+                    </h3>
                     <p className="text-xs text-red-500 mt-1 font-medium">Reorder needed</p>
                   </div>
                   <div className="p-3 bg-red-100 rounded-xl border border-red-200/60">
@@ -226,7 +224,9 @@ export default function InventoryPage() {
 
                         <div className="p-3 bg-[#EEF2F6]/80 rounded-lg border border-white/80">
                           <p className="text-xs text-[#7E5C4A] uppercase">Last Updated</p>
-                          <p className="font-medium text-[#272727]">{formatDate(selectedItem.lastUpdated)}</p>
+                          <p className="font-medium text-[#272727]">
+                            {selectedItem.updatedAt ? formatDate(selectedItem.updatedAt as any) : "-"}
+                          </p>
                         </div>
                       </div>
 

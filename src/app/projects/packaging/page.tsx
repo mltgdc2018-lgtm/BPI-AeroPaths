@@ -11,6 +11,8 @@ import {
   Database,
   LayoutGrid,
   FlaskConical,
+  PieChart,
+  Boxes,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils/cn";
@@ -53,6 +55,18 @@ const sections = [
     icon: Database,
   },
   {
+    title: "Material Usage Analysis",
+    description: "View total raw material consumption per job, month, or year based on actual packaging records and BOM.",
+    href: "/projects/packaging/analysis",
+    icon: PieChart,
+  },
+  {
+    title: "Raw Material Balance",
+    description: "จัดการวัตถุดิบ — รับเข้า, ใช้ไป, คงเหลือ พร้อมระบบ FIFO",
+    href: "/projects/packaging/raw-material-balance",
+    icon: Boxes,
+  },
+  {
     title: "Logic Process",
     description: "Visualize and debug algorithm decisions with a step-by-step process view.",
     href: "/projects/packaging/logic-process",
@@ -69,6 +83,7 @@ const tiltClasses = [
   "md:rotate-[0.8deg]",
   "md:-rotate-[0.7deg]",
   "md:rotate-[0.6deg]",
+  "md:-rotate-[0.8deg]",
 ] as const;
 
 export default function PackagingDashboard() {

@@ -207,10 +207,10 @@ const PACKAGING_BREAKDOWN_FIELDS: Array<{
 
 const STANDARD_KEYS: PackagingBreakdownKey[] = [
   "qty110x110x115",
-  "qty110x110x90",
-  "qty110x110x65",
   "qty80x120x115",
+  "qty110x110x90",
   "qty80x120x90",
+  "qty110x110x65",
   "qty80x120x65",
 ];
 
@@ -1850,148 +1850,60 @@ export default function PackagingReportsPage() {
               </div>
 
               <div className="space-y-4">
-                <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-4">
-                  <GlassCard className={clayChartCardClass}>
-                    <div className="flex items-center gap-2 mb-3 transition-all duration-300 group-hover/chart:-translate-y-3">
-                      <Database className="w-4 h-4 text-[#5D6D7E] transition-transform duration-300 group-hover/chart:scale-110 group-hover/chart:-rotate-3" />
-                      <h3 className="text-lg font-black text-[#34495E] tracking-tight transition-all duration-300 group-hover/chart:translate-x-0.5">Packing Volume Timeline</h3>
-                    </div>
-                    {timelineChart.hasData ? (
-                      <div className="overflow-hidden rounded-2xl">
-                        <svg
-                          viewBox={`0 0 ${timelineChart.width} ${timelineChart.height}`}
-                          className="h-[250px] w-full transition-transform duration-300 group-hover/chart:scale-[1.01]"
-                        >
-                          {timelineChart.yTicks.map((tick) => {
-                            const y = 14 + (212 - (tick / Math.max(...timelineChart.yTicks, 1)) * 212);
-                            return (
-                              <g key={tick} className="transition-all duration-300 group-hover/chart:translate-x-0.5">
-                                <line
-                                  x1="40"
-                                  x2="904"
-                                  y1={y}
-                                  y2={y}
-                                  stroke="#D6DEE8"
-                                  strokeDasharray="4 6"
-                                  className="transition-opacity duration-300 group-hover/chart:opacity-90"
-                                />
-                                <text
-                                  x="12"
-                                  y={y + 4}
-                                  fontSize="11"
-                                  fill="#8C9AAA"
-                                  className="transition-all duration-300 group-hover/chart:-translate-x-0.5"
-                                >
-                                  {tick}
-                                </text>
-                              </g>
-                            );
-                          })}
-                          <path
-                            d={timelineChart.packagePath}
-                            fill="none"
-                            stroke="#9A7656"
-                            strokeWidth="3"
-                            className="transition-all duration-300 group-hover/chart:translate-y-[-1px]"
-                          />
-                          <path
-                            d={timelineChart.productPath}
-                            fill="none"
-                            stroke="#E9C46A"
-                            strokeWidth="3"
-                            className="transition-all duration-300 group-hover/chart:translate-y-[-1px]"
-                          />
-                          {timelineChart.points.map((point) => (
-                            <text
-                              key={point.x}
-                              x={point.x}
-                              y={246}
-                              textAnchor="middle"
-                              fontSize="10"
-                              fill="#8C9AAA"
-                              className="transition-all duration-300 group-hover/chart:-translate-y-2"
-                            >
-                              {point.label}
-                            </text>
-                          ))}
-                        </svg>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <GlassCard className={clayBadgeCardClass}>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-black uppercase tracking-wider text-[#7E5C4A]/90">STANDARD PACKAGE Total:</p>
+                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#9A7656]/20 text-[#9A7656]">
+                          <Package className="h-5 w-5" />
+                        </span>
                       </div>
-                    ) : (
-                      <p className="text-sm text-[#5D6D7E]/70 py-6">No timeline data</p>
-                    )}
-                    <div className="flex flex-wrap items-center gap-4 text-sm font-bold pt-1">
-                      <span className="inline-flex items-center gap-1.5 text-[#5D6D7E] transition-all duration-200 group-hover/chart:-translate-y-2 hover:-translate-y-3 hover:scale-105">
-                        <span className="h-2.5 w-2.5 rounded-full bg-[#9A7656]" />
-                        Packages Used
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 text-[#5D6D7E] transition-all duration-200 group-hover/chart:-translate-y-2 hover:-translate-y-3 hover:scale-105">
-                        <span className="h-2.5 w-2.5 rounded-full bg-[#E9C46A]" />
-                        Products (QTY)
-                      </span>
+                      <p className="text-4xl font-black text-[#34495E]">
+                        <CountingNumber value={packageTypeUsage.standard.total} />
+                      </p>
                     </div>
                   </GlassCard>
 
-                  <GlassCard className={clayChartCardClass}>
-                    <div className="flex items-center gap-2 mb-3 transition-all duration-300 group-hover/chart:-translate-y-3">
-                      <Package className="w-4 h-4 text-[#5D6D7E] transition-transform duration-300 group-hover/chart:scale-110 group-hover/chart:-rotate-3" />
-                      <h3 className="text-lg font-black text-[#34495E] tracking-tight transition-all duration-300 group-hover/chart:translate-x-0.5">Transport Mode</h3>
-                    </div>
-                    <div className="flex items-center justify-center py-2">
-                      <svg viewBox="0 0 180 180" className="w-[210px] h-[210px] transition-transform duration-300 group-hover/chart:scale-[1.03]">
-                        <circle
-                          cx="90"
-                          cy="90"
-                          r="66"
-                          fill="none"
-                          stroke="#EEE2D2"
-                          strokeWidth="20"
-                          className="transition-transform duration-300 group-hover/chart:scale-[1.03]"
-                        />
-                        {transportModeChart.segments.map((segment) => (
-                          <circle
-                            key={segment.label}
-                            cx="90"
-                            cy="90"
-                            r="66"
-                            fill="none"
-                            stroke={segment.color}
-                            strokeWidth="20"
-                            strokeDasharray={segment.dashArray}
-                            strokeDashoffset={segment.dashOffset}
-                            strokeLinecap="round"
-                            transform="rotate(-90 90 90)"
-                            className="transition-transform duration-300 group-hover/chart:scale-[1.03]"
-                          />
-                        ))}
-                        <text
-                          x="90"
-                          y="88"
-                          textAnchor="middle"
-                          className="fill-[#34495E] transition-all duration-300 group-hover/chart:-translate-y-2"
-                          fontSize="26"
-                          fontWeight="700"
-                        >
-                          {transportModeChart.total}
-                        </text>
-                        <text
-                          x="90"
-                          y="106"
-                          textAnchor="middle"
-                          className="fill-[#8C9AAA] transition-all duration-300 group-hover/chart:translate-y-1"
-                          fontSize="10"
-                          fontWeight="600"
-                        >
-                          records
-                        </text>
-                      </svg>
-                    </div>
-                    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm font-bold">
-                      {transportModeChart.segments.map((segment) => (
-                        <span key={segment.label} className="inline-flex items-center gap-1.5 text-[#5D6D7E] transition-all duration-200 group-hover/chart:-translate-y-2 hover:-translate-y-3 hover:scale-105">
-                          <span className="h-2.5 w-2.5 rounded-[2px]" style={{ backgroundColor: segment.color }} />
-                          {segment.label}
+                  <GlassCard className={clayBadgeCardClass}>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-black uppercase tracking-wider text-[#7E5C4A]/90">BOXES PACKAGE Total:</p>
+                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#D7B894]/20 text-[#D7B894]">
+                          <Package className="h-5 w-5" />
                         </span>
-                      ))}
+                      </div>
+                      <p className="text-4xl font-black text-[#34495E]">
+                        <CountingNumber value={packageTypeUsage.boxes.total} />
+                      </p>
+                    </div>
+                  </GlassCard>
+
+                  <GlassCard className={clayBadgeCardClass}>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-black uppercase tracking-wider text-[#7E5C4A]/90">RETURNABLE PACKAGE Total:</p>
+                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#E9C46A]/20 text-[#E9C46A]">
+                          <Package className="h-5 w-5" />
+                        </span>
+                      </div>
+                      <p className="text-4xl font-black text-[#34495E]">
+                        <CountingNumber value={packageTypeUsage.returnable.total} />
+                      </p>
+                    </div>
+                  </GlassCard>
+
+                  <GlassCard className={clayBadgeCardClass}>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-black uppercase tracking-wider text-[#7E5C4A]/90">WRAP PACKAGE Total:</p>
+                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#CDB79E]/20 text-[#CDB79E]">
+                          <Package className="h-5 w-5" />
+                        </span>
+                      </div>
+                      <p className="text-4xl font-black text-[#34495E]">
+                        <CountingNumber value={packageTypeUsage.warp.total} />
+                      </p>
                     </div>
                   </GlassCard>
                 </div>
