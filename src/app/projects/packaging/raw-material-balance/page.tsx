@@ -125,9 +125,9 @@ export default function RawMaterialBalancePage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [formDate, setFormDate] = useState(new Date().toISOString().slice(0, 10));
   const [formJobOrder, setFormJobOrder] = useState("");
-  const [formJobOrder, setFormJobOrder] = useState("");
   const [formQuantities, setFormQuantities] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [showPaste, setShowPaste] = useState(false);
 
   // Delete confirm
   const [deleteTarget, setDeleteTarget] = useState<RawMaterialTransaction | null>(null);
@@ -366,6 +366,39 @@ export default function RawMaterialBalancePage() {
     setFormDate(new Date().toISOString().slice(0, 10));
     setFormJobOrder("");
     setFormQuantities({});
+    setShowPaste(false);
+  };
+
+  const handlePaste = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const text = e.target.value;
+    if (!text) return;
+
+    const lines = text.split(/\r?\n/);
+    const newQuantities = { ...formQuantities };
+    let matchCount = 0;
+
+    lines.forEach(line => {
+      const parts = line.split('\t');
+      if (parts.length >= 2) {
+        const matName = parts[0].trim();
+        const qtyStr = parts[1].trim().replace(/,/g, '');
+        const qty = parseFloat(qtyStr);
+
+        if (!isNaN(qty) && qty > 0) {
+          const matchedMat = rawMaterials.find(m => m.name.toLowerCase() === matName.toLowerCase());
+          if (matchedMat) {
+            newQuantities[matchedMat.name] = qty.toString();
+            matchCount++;
+          }
+        }
+      }
+    });
+
+    if (matchCount > 0) {
+      setFormQuantities(newQuantities);
+    }
+    e.target.value = '';
+    setShowPaste(false);
   };
 
   // ── Tab Config ────────────────────────────────────────────────────────────
@@ -742,8 +775,23 @@ export default function RawMaterialBalancePage() {
                   className="w-full px-3 py-2 bg-[#EEF2F6]/80 border border-white/80 rounded-lg text-sm text-[#272727] focus:outline-none focus:ring-2 focus:ring-[#9ACD32]/20" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#7E5C4A] uppercase">Raw Materials</label>
-                <div className="max-h-60 overflow-y-auto border border-[#E8DCC9] rounded-lg">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-[#7E5C4A] uppercase">Raw Materials</label>
+                  <button onClick={() => setShowPaste(!showPaste)}
+                    className="text-[10px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                    {showPaste ? "Cancel Paste" : "📋 Paste from Excel"}
+                  </button>
+                </div>
+                
+                {showPaste && (
+                  <textarea 
+                    placeholder="Paste Excel columns here (Material Name followed by Qty)..." 
+                    onChange={handlePaste}
+                    className="w-full text-xs p-3 bg-blue-50/50 border border-blue-200 rounded-lg text-[#272727] focus:outline-none focus:ring-2 focus:ring-blue-300 resize-y min-h-[80px]"
+                  />
+                )}
+
+                <div className={`overflow-y-auto border border-[#E8DCC9] rounded-lg ${showPaste ? "max-h-40" : "max-h-60"}`}>
                   <table className="w-full text-sm text-left">
                     <thead className="bg-[#EEF2F6] sticky top-0 border-b border-[#E8DCC9] z-10">
                       <tr>
