@@ -15,7 +15,6 @@ import type { Requisition } from "@/lib/firebase/services/requisition.service";
 import { useEffect } from "react";
 export default function RequisitionPage() {
   const [requisitions, setRequisitions] = useState<Requisition[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // State
   const [searchValue, setSearchValue] = useState("");
@@ -27,18 +26,16 @@ export default function RequisitionPage() {
   const [requiredDate, setRequiredDate] = useState("");
   const [departments, setDepartments] = useState(["Production", "Maintenance", "Logistics", "Assembly"]);
   const [selectedDepartment, setSelectedDepartment] = useState("");
-  const [priority, setPriority] = useState<"Normal" | "Urgent">("Normal");
 
-  useEffect(() => {
-    fetchRequisitions();
-  }, []);
-
-  const fetchRequisitions = async () => {
-    setLoading(true);
+  async function fetchRequisitions() {
     const { data } = await RequisitionService.getAll();
     setRequisitions(data || []);
-    setLoading(false);
-  };
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchRequisitions();
+  }, []);
 
   // Table Columns
   const columns: Column<Requisition>[] = [

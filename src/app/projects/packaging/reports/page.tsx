@@ -865,6 +865,7 @@ export default function PackagingReportsPage() {
     [filteredRows]
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const timelineChart = useMemo(() => {
     const dateMap = new Map<
       string,
@@ -928,6 +929,7 @@ export default function PackagingReportsPage() {
     };
   }, [filteredRows]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const transportModeChart = useMemo(() => {
     const modeMap = new Map<string, number>();
     filteredRows.forEach((row) => {

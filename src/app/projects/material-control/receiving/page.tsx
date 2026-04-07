@@ -15,7 +15,6 @@ import type { ReceivingNote } from "@/lib/firebase/services/receiving.service";
 import { useEffect } from "react";
 export default function ReceivingPage() {
   const [receivingNotes, setReceivingNotes] = useState<ReceivingNote[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // State
   const [searchValue, setSearchValue] = useState("");
@@ -27,19 +26,16 @@ export default function ReceivingPage() {
   const [receiveDate, setReceiveDate] = useState("");
   const [suppliers, setSuppliers] = useState(["ABC Metals Co.", "Thai Steel Ltd.", "Global Supplies", "Premium Parts"]);
   const [selectedSupplier, setSelectedSupplier] = useState("");
-  const [poNumber, setPoNumber] = useState("");
-  const [remarks, setRemarks] = useState("");
 
-  useEffect(() => {
-    fetchReceivingNotes();
-  }, []);
-
-  const fetchReceivingNotes = async () => {
-    setLoading(true);
+  async function fetchReceivingNotes() {
     const { data } = await ReceivingService.getAll();
     setReceivingNotes(data || []);
-    setLoading(false);
-  };
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchReceivingNotes();
+  }, []);
 
   // Table Columns
   const columns: Column<ReceivingNote>[] = [

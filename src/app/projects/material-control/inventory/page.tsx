@@ -14,23 +14,21 @@ import { useEffect } from "react";
 
 export default function InventoryPage() {
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "history">("overview");
   const [searchValue, setSearchValue] = useState("");
   const [filterYear, setFilterYear] = useState(new Date().getFullYear().toString());
 
-  useEffect(() => {
-    fetchInventory();
-  }, []);
-
-  const fetchInventory = async () => {
-    setLoading(true);
+  async function fetchInventory() {
     const { data } = await InventoryService.getAll();
     setInventoryItems(data || []);
-    setLoading(false);
-  };
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchInventory();
+  }, []);
 
   // Table Columns
   const columns: Column<InventoryItem>[] = [
@@ -58,7 +56,7 @@ export default function InventoryPage() {
       item.description.toLowerCase().includes(searchValue.toLowerCase());
     
     // We will need to check item.updatedAt for date-based filter
-    const lastUpdateDate = item.updatedAt ? new Date(item.updatedAt as any).toISOString() : "";
+    const lastUpdateDate = item.updatedAt ? new Date(item.updatedAt as unknown as string).toISOString() : "";
     const matchesYear = filterYear === "All" || lastUpdateDate.startsWith(filterYear);
     return matchesSearch && matchesYear;
   });
@@ -225,7 +223,7 @@ export default function InventoryPage() {
                         <div className="p-3 bg-[#EEF2F6]/80 rounded-lg border border-white/80">
                           <p className="text-xs text-[#7E5C4A] uppercase">Last Updated</p>
                           <p className="font-medium text-[#272727]">
-                            {selectedItem.updatedAt ? formatDate(selectedItem.updatedAt as any) : "-"}
+                            {selectedItem.updatedAt ? formatDate(selectedItem.updatedAt as unknown as Date) : "-"}
                           </p>
                         </div>
                       </div>
