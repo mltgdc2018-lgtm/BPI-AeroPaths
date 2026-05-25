@@ -6,8 +6,9 @@ import { GlassCard } from "@/components/shared/GlassCard";
 import { Modal } from "@/components/shared/Modal";
 import { SearchToolbar } from "@/components/shared/SearchToolbar";
 import { DataTable, Column } from "@/components/shared/DataTable";
-import { Clock, CalendarDays, TrendingUp, Download, Plus, Edit, Trash2, FileText } from "lucide-react";
+import { Clock, CalendarDays, TrendingUp, Download, Plus, Edit, Trash2, FileText, ChevronDown } from "lucide-react";
 import { formatDate } from "@/lib/utils/formatters";
+import { exportToCSV } from "@/lib/utils/csvExport";
 import { ActivityService, ActivityLog } from "@/lib/firebase/services/activity.service";
 
 export default function ActivityPage() {
@@ -125,7 +126,8 @@ export default function ActivityPage() {
       activity.action?.toLowerCase().includes(searchValue.toLowerCase());
     
     const matchesYear = filterYear === "All" || activityDate.getFullYear().toString() === filterYear;
-    return matchesSearch && matchesYear;
+    const matchesMonth = filterMonth === "All" || activityDate.getMonth().toString() === filterMonth;
+    return matchesSearch && matchesYear && matchesMonth;
   });
 
   // Stats calculation
@@ -197,24 +199,45 @@ export default function ActivityPage() {
                 primaryButton={{
                   label: "Export Log",
                   icon: <Download className="w-4 h-4" />,
-                  onClick: () => console.log("Export activities"),
+                  onClick: () => exportToCSV(
+                    filteredData.map(a => ({
+                      timestamp: formatDate(a.timestamp as unknown as Date),
+                      time: (a.timestamp as unknown as Date).toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" }),
+                      action: a.action || "",
+                      module: a.module || "",
+                      targetName: a.targetName || "",
+                      user: a.user || "",
+                    })),
+                    [
+                      { key: "timestamp", header: "Date" },
+                      { key: "time", header: "Time" },
+                      { key: "action", header: "Action" },
+                      { key: "module", header: "Module" },
+                      { key: "targetName", header: "Target" },
+                      { key: "user", header: "User" },
+                    ],
+                    "activity_log"
+                  ),
                 }}
               >
-                <div className="flex min-w-[150px] flex-col gap-1">
-                  <label className="text-[10px] font-black uppercase tracking-wide text-[#7E5C4A]/80">
+                <div className="flex flex-col gap-1.5 min-w-[180px] md:translate-y-[-10px]">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-[#8C9AAA] ml-1">
                     Month
                   </label>
-                  <select
-                    value={filterMonth}
-                    onChange={(event) => setFilterMonth(event.target.value)}
-                    className="px-4 py-2 bg-[#FDF6EC] border border-[#E8DCC9] rounded-lg text-sm text-[#7E5C4A] hover:bg-[#F6EDDE] transition-colors outline-none focus:ring-2 focus:ring-[#D4AA7D]/35 focus:border-[#D4AA7D]/50"
-                  >
-                    {MONTHS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={filterMonth}
+                      onChange={(event) => setFilterMonth(event.target.value)}
+                      className="w-full pl-4 pr-10 py-2 bg-[#FDF6EC] border border-[#E8DCC9] rounded-xl text-sm text-[#7E5C4A] hover:bg-white hover:border-[#D4AA7D]/50 transition-all duration-300 appearance-none cursor-pointer outline-none focus:ring-2 focus:ring-[#D4AA7D]/20 shadow-sm"
+                    >
+                      {MONTHS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7E5C4A]/50 pointer-events-none" />
+                  </div>
                 </div>
               </SearchToolbar>
 

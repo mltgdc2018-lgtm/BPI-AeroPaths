@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { ModuleHeader } from "@/components/projects/material-control/ModuleHeader";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { Modal } from "@/components/shared/Modal";
 import { SearchToolbar } from "@/components/shared/SearchToolbar";
@@ -123,7 +122,7 @@ export function MasterDataView() {
                 primaryButton={{
                   label: "Add Material",
                   icon: <Plus className="w-4 h-4" />,
-                  onClick: () => console.log("Add material"),
+                  onClick: () => alert("กรุณาเพิ่มวัตถุดิบที่หน้า Settings > Master Data"),
                 }}
               />
 

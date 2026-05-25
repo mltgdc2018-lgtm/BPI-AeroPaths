@@ -12,7 +12,6 @@ import {
   LayoutGrid,
   FlaskConical,
   PieChart,
-  Boxes,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils/cn";

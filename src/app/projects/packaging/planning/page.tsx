@@ -38,6 +38,7 @@ import { buildExpectedQtyMap, validateAdjustedResult } from "@/lib/planning/adju
 import { buildPackingDetailSheetEntries, summarizePoNos } from "@/lib/packing-details/export.helpers";
 import type { PackingDetailsExportOptions } from "@/lib/packing-details/export.types";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { exportToCSV } from "@/lib/utils/csvExport";
 
 interface PlanSummary {
   totalPallets: number;
@@ -527,6 +528,43 @@ export default function PackagingBookingPage() {
     } finally {
       setIsExportingPlan(false);
     }
+  };
+
+  const handleDownloadCSV = () => {
+    if (!planResult.length || !selectedCustomer) return;
+    if (validationResult.errors.length > 0) {
+      alert("Please resolve validation errors before exporting CSV.");
+      return;
+    }
+
+    const csvData: any[] = [];
+    planResult.forEach((poGroup) => {
+      poGroup.cases.forEach((c) => {
+        c.items.forEach((item) => {
+          csvData.push({
+            po: poGroup.po,
+            caseNo: c.caseNo,
+            sku: item.sku,
+            qty: item.qty,
+            type: c.type,
+            dims: c.dims,
+            note: c.note || "-",
+          });
+        });
+      });
+    });
+
+    const columns: { key: keyof typeof csvData[0]; header: string }[] = [
+      { key: "po", header: "PO" },
+      { key: "caseNo", header: "Case No." },
+      { key: "sku", header: "SKU" },
+      { key: "qty", header: "Qty" },
+      { key: "type", header: "Package Type" },
+      { key: "dims", header: "Dimensions" },
+      { key: "note", header: "Note" },
+    ];
+
+    exportToCSV(csvData, columns, `PlanPack_${selectedCustomer.code}`);
   };
 
   const handleExportPackingDetails = async () => {
@@ -1230,6 +1268,17 @@ export default function PackagingBookingPage() {
                                       <FileText className="w-8 h-8 text-[#7E5C4A] group-hover:text-[#EFD09E] transition-colors"/>
                                       <span className="font-bold text-[#7E5C4A] group-hover:text-[#EFD09E]">
                                         {isLoadingShipmentOptions ? "Loading Shipment..." : isExportingPackingDetails ? "Preparing..." : "Download Packing Details"}
+                                      </span>
+                                  </button>
+
+                                  <button 
+                                      onClick={handleDownloadCSV}
+                                      disabled={validationResult.errors.length > 0}
+                                      className="flex flex-col items-center justify-center gap-3 p-6 bg-[#EFD09E]/40 border-2 border-[#D4AA7D]/35 rounded-2xl hover:border-[#272727] hover:bg-[#272727] transition-all group "
+                                  >
+                                      <FileSpreadsheet className="w-8 h-8 text-[#7E5C4A] group-hover:text-[#EFD09E] transition-colors"/>
+                                      <span className="font-bold text-[#7E5C4A] group-hover:text-[#EFD09E]">
+                                        Download CSV
                                       </span>
                                   </button>
                                   

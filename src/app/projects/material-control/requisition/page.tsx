@@ -13,7 +13,11 @@ import { formatDate } from "@/lib/utils/formatters";
 import { RequisitionService } from "@/lib/firebase/services/requisition.service";
 import type { Requisition } from "@/lib/firebase/services/requisition.service";
 import { useEffect } from "react";
+import { RawMaterialUsageTab } from "@/components/projects/material-control/RawMaterialUsageTab";
+import { ListChecks, PackageMinus } from "lucide-react";
+
 export default function RequisitionPage() {
+  const [activeTab, setActiveTab] = useState<"general" | "raw-materials">("general");
   const [requisitions, setRequisitions] = useState<Requisition[]>([]);
 
   // State
@@ -36,6 +40,15 @@ export default function RequisitionPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchRequisitions();
   }, []);
+
+  // Computed Stats
+  const pendingCount = requisitions.filter(r => r.status === "Pending").length;
+  const approvedTodayCount = requisitions.filter(r => {
+    if (r.status !== "Approved") return false;
+    const today = new Date().toISOString().slice(0, 10);
+    return r.date === today;
+  }).length;
+  const urgentCount = requisitions.filter(r => r.priority === "High" && r.status === "Pending").length;
 
   // Table Columns
   const columns: Column<Requisition>[] = [
@@ -107,12 +120,40 @@ export default function RequisitionPage() {
             description="Manage material requests and approvals."
           >
             <div className="space-y-6 mt-8">
-              {/* Stats Dashboard */}
+              {/* ─── Top Level Tabs ──────────────────────────────────── */}
+              <div className="flex border-b border-[#D4AA7D]/30 mb-6">
+                <button
+                  onClick={() => setActiveTab("general")}
+                  className={`flex items-center gap-2 px-6 py-3 text-sm font-bold border-b-2 transition-all duration-200 ${
+                    activeTab === "general"
+                      ? "border-[#9ACD32] text-[#272727] bg-[#EFD09E]/30"
+                      : "border-transparent text-[#7E5C4A]/70 hover:text-[#272727] hover:bg-[#EEF2F6]/60"
+                  }`}
+                >
+                  <ListChecks className="w-4 h-4" />
+                  General Requisition
+                </button>
+                <button
+                  onClick={() => setActiveTab("raw-materials")}
+                  className={`flex items-center gap-2 px-6 py-3 text-sm font-bold border-b-2 transition-all duration-200 ${
+                    activeTab === "raw-materials"
+                      ? "border-[#9ACD32] text-[#272727] bg-[#EFD09E]/30"
+                      : "border-transparent text-[#7E5C4A]/70 hover:text-[#272727] hover:bg-[#EEF2F6]/60"
+                  }`}
+                >
+                  <PackageMinus className="w-4 h-4" />
+                  Raw Material Usage (Auto from Packing)
+                </button>
+              </div>
+
+              {activeTab === "general" ? (
+                <>
+                  {/* Stats Dashboard */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <GlassCard className="p-4 flex items-center justify-between bg-[#EEF2F6]/95 border border-white/80 shadow-[8px_8px_18px_rgba(166,180,200,0.28),-8px_-8px_18px_rgba(255,255,255,0.92)] hover:bg-[#272727] group transition-all duration-300">
                   <div>
                     <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Pending Approval</p>
-                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">5</h3>
+                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">{pendingCount}</h3>
                     <p className="text-xs text-amber-500 mt-1 font-medium">Action required</p>
                   </div>
                   <div className="p-3 bg-[#9ACD32] rounded-xl border border-[#EFD09E]/50">
@@ -123,7 +164,7 @@ export default function RequisitionPage() {
                 <GlassCard className="p-4 flex items-center justify-between bg-[#EEF2F6]/95 border border-white/80 shadow-[8px_8px_18px_rgba(166,180,200,0.28),-8px_-8px_18px_rgba(255,255,255,0.92)] hover:bg-[#272727] group transition-all duration-300">
                   <div>
                     <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Approved Today</p>
-                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">12</h3>
+                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">{approvedTodayCount}</h3>
                     <p className="text-xs text-emerald-600 mt-1 font-medium">Items released</p>
                   </div>
                   <div className="p-3 bg-[#9ACD32] rounded-xl border border-[#EFD09E]/50">
@@ -134,7 +175,7 @@ export default function RequisitionPage() {
                 <GlassCard className="p-4 flex items-center justify-between bg-[#EEF2F6]/95 border border-white/80 shadow-[8px_8px_18px_rgba(166,180,200,0.28),-8px_-8px_18px_rgba(255,255,255,0.92)] hover:bg-[#272727] group transition-all duration-300">
                   <div>
                     <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Urgent Requests</p>
-                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">2</h3>
+                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">{urgentCount}</h3>
                     <p className="text-xs text-red-500 mt-1 font-medium">High priority</p>
                   </div>
                   <div className="p-3 bg-red-100 rounded-xl">
@@ -165,6 +206,10 @@ export default function RequisitionPage() {
                 onRowClick={(row) => setSelectedReq(row)}
                 emptyMessage="No requisitions found"
               />
+                </>
+              ) : (
+                <RawMaterialUsageTab />
+              )}
             </div>
           </ModuleHeader>
 
@@ -272,7 +317,8 @@ export default function RequisitionPage() {
                 >
                   Cancel
                 </button>
-                <button className="flex-1 py-2.5 bg-[#272727] hover:bg-[#1f1f1f] text-[#EFD09E] rounded-lg font-medium transition-colors shadow-lg shadow-[#272727]/25 border border-[#EFD09E]/20">
+                <button className="flex-1 py-2.5 bg-[#272727] hover:bg-[#1f1f1f] text-[#EFD09E] rounded-lg font-medium transition-colors shadow-lg shadow-[#272727]/25 border border-[#EFD09E]/20"
+                  onClick={() => { alert("สร้างใบเบิกสำเร็จ (Feature under development)"); setIsNewReqModalOpen(false); }}>
                   Submit Request
                 </button>
               </div>
@@ -353,16 +399,19 @@ export default function RequisitionPage() {
               <div className="pt-4 border-t border-[#D4AA7D]/25 mt-auto flex gap-3">
                 {selectedReq?.status === "Pending" && (
                   <>
-                    <button className="flex-1 py-2.5 bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-100 rounded-lg font-medium transition-colors">
+                    <button onClick={() => { alert(`Rejected: ${selectedReq?.requisitionNo || selectedReq?.id}`); setSelectedReq(null); }}
+                      className="flex-1 py-2.5 bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-100 rounded-lg font-medium transition-colors">
                       Reject
                     </button>
-                    <button className="flex-1 py-2.5 bg-[#272727] hover:bg-[#1f1f1f] text-[#EFD09E] rounded-lg font-medium transition-colors shadow-lg shadow-[#272727]/25 border border-[#EFD09E]/20">
+                    <button onClick={() => { alert(`Approved: ${selectedReq?.requisitionNo || selectedReq?.id}`); setSelectedReq(null); }}
+                      className="flex-1 py-2.5 bg-[#272727] hover:bg-[#1f1f1f] text-[#EFD09E] rounded-lg font-medium transition-colors shadow-lg shadow-[#272727]/25 border border-[#EFD09E]/20">
                       Approve Request
                     </button>
                   </>
                 )}
                 {selectedReq?.status !== "Pending" && (
-                  <button className="flex-1 py-2.5 bg-[#EEF2F6] text-[#7E5C4A] hover:bg-white rounded-lg font-medium transition-colors border border-white/80">
+                  <button onClick={() => alert("Export feature coming soon")}
+                    className="flex-1 py-2.5 bg-[#EEF2F6] text-[#7E5C4A] hover:bg-white rounded-lg font-medium transition-colors border border-white/80">
                     Print / Export
                   </button>
                 )}

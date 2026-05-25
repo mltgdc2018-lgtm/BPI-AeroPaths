@@ -93,6 +93,12 @@ export default function SettingsPage() {
     return matchesSearch && matchesType;
   });
 
+  // Computed Stats from data
+  const categoryCount = masterData.filter(i => i.type === "Category").length;
+  const locationCount = masterData.filter(i => i.type === "Location").length;
+  const supplierCount = masterData.filter(i => i.type === "Supplier").length;
+  const unitCount = masterData.filter(i => i.type === "Unit" || i.type === "Department").length;
+
   return (
     <div className="min-h-screen pt-20 bg-[#F6EDDE] relative overflow-hidden">
       <div className="absolute top-24 -left-16 w-72 h-72 bg-[#D4AA7D]/15 rounded-full blur-3xl" />
@@ -109,7 +115,7 @@ export default function SettingsPage() {
                 <GlassCard className="p-4 flex items-center justify-between bg-[#EEF2F6]/95 border border-white/80 shadow-[8px_8px_18px_rgba(166,180,200,0.28),-8px_-8px_18px_rgba(255,255,255,0.92)] hover:bg-[#272727] group transition-all duration-300">
                   <div>
                     <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Categories</p>
-                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">12</h3>
+                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">{categoryCount}</h3>
                   </div>
                   <div className="p-3 bg-[#9ACD32] rounded-xl border border-[#EFD09E]/50">
                     <Tag className="w-6 h-6 text-[#272727]" />
@@ -119,7 +125,7 @@ export default function SettingsPage() {
                 <GlassCard className="p-4 flex items-center justify-between bg-[#EEF2F6]/95 border border-white/80 shadow-[8px_8px_18px_rgba(166,180,200,0.28),-8px_-8px_18px_rgba(255,255,255,0.92)] hover:bg-[#272727] group transition-all duration-300">
                   <div>
                     <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Locations</p>
-                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">8</h3>
+                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">{locationCount}</h3>
                   </div>
                   <div className="p-3 bg-[#9ACD32] rounded-xl border border-[#EFD09E]/50">
                     <MapPin className="w-6 h-6 text-[#272727]" />
@@ -129,7 +135,7 @@ export default function SettingsPage() {
                 <GlassCard className="p-4 flex items-center justify-between bg-[#EEF2F6]/95 border border-white/80 shadow-[8px_8px_18px_rgba(166,180,200,0.28),-8px_-8px_18px_rgba(255,255,255,0.92)] hover:bg-[#272727] group transition-all duration-300">
                   <div>
                     <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Suppliers</p>
-                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">24</h3>
+                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">{supplierCount}</h3>
                   </div>
                   <div className="p-3 bg-[#9ACD32] rounded-xl border border-[#EFD09E]/50">
                     <Building className="w-6 h-6 text-[#272727]" />
@@ -138,8 +144,8 @@ export default function SettingsPage() {
 
                 <GlassCard className="p-4 flex items-center justify-between bg-[#EEF2F6]/95 border border-white/80 shadow-[8px_8px_18px_rgba(166,180,200,0.28),-8px_-8px_18px_rgba(255,255,255,0.92)] hover:bg-[#272727] group transition-all duration-300">
                   <div>
-                    <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Users</p>
-                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">15</h3>
+                    <p className="text-[#7E5C4A] text-sm font-medium group-hover:text-[#EFD09E]/80">Others</p>
+                    <h3 className="text-2xl font-bold text-[#272727] mt-1 group-hover:text-[#EFD09E]">{unitCount}</h3>
                   </div>
                   <div className="p-3 bg-[#9ACD32] rounded-xl border border-[#EFD09E]/50">
                     <Users className="w-6 h-6 text-[#272727]" />
@@ -213,7 +219,8 @@ export default function SettingsPage() {
                 >
                   Cancel
                 </button>
-                <button className="flex-1 py-2.5 bg-[#272727] hover:bg-[#1f1f1f] text-[#EFD09E] rounded-lg font-medium transition-colors shadow-lg shadow-[#272727]/25 border border-[#EFD09E]/20 flex items-center justify-center gap-2">
+                <button className="flex-1 py-2.5 bg-[#272727] hover:bg-[#1f1f1f] text-[#EFD09E] rounded-lg font-medium transition-colors shadow-lg shadow-[#272727]/25 border border-[#EFD09E]/20 flex items-center justify-center gap-2"
+                  onClick={() => { alert("บันทึก Master Data สำเร็จ (Feature under development)"); setIsNewItemModalOpen(false); }}>
                   <Save className="w-4 h-4" />
                   Save
                 </button>
@@ -267,10 +274,12 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="flex gap-3 pt-4 border-t border-[#D4AA7D]/25">
-                  <button className="px-4 py-2.5 bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-100 rounded-lg font-medium transition-colors">
+                  <button onClick={() => { alert(`ลบ ${selectedItem.name} สำเร็จ (Feature under development)`); setSelectedItem(null); }}
+                    className="px-4 py-2.5 bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-100 rounded-lg font-medium transition-colors">
                     Delete
                   </button>
-                  <button className="flex-1 py-2.5 bg-[#272727] hover:bg-[#1f1f1f] text-[#EFD09E] rounded-lg font-medium transition-colors shadow-lg shadow-[#272727]/25 border border-[#EFD09E]/20 flex items-center justify-center gap-2">
+                  <button onClick={() => { alert(`บันทึกการแก้ไข ${selectedItem.name} สำเร็จ (Feature under development)`); setSelectedItem(null); }}
+                    className="flex-1 py-2.5 bg-[#272727] hover:bg-[#1f1f1f] text-[#EFD09E] rounded-lg font-medium transition-colors shadow-lg shadow-[#272727]/25 border border-[#EFD09E]/20 flex items-center justify-center gap-2">
                     <Save className="w-4 h-4" />
                     Save Changes
                   </button>

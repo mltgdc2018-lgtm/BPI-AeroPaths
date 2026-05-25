@@ -3,11 +3,13 @@
 import { useState, useMemo } from "react";
 import { ModuleHeader } from "@/components/projects/material-control/ModuleHeader";
 import { GlassCard } from "@/components/shared/GlassCard";
+import { Modal } from "@/components/shared/Modal";
 import { SearchToolbar } from "@/components/shared/SearchToolbar";
 import { DataTable, Column } from "@/components/shared/DataTable";
 import { DateInput } from "@/components/shared/DateInput";
 import { SelectField } from "@/components/shared/SelectField";
 import { BarChart3, TrendingUp, FileText, Download, Calendar } from "lucide-react";
+import { exportToCSV } from "@/lib/utils/csvExport";
 
 // Types
 interface ReportSummary {
@@ -41,6 +43,7 @@ export default function ReportsPage() {
   const [dateTo, setDateTo] = useState("");
   const [reportTypes] = useState(["Activity", "Analytics", "Inventory", "Receiving", "Requisition"]);
   const [selectedReportType, setSelectedReportType] = useState("");
+  const [selectedReport, setSelectedReport] = useState<ReportSummary | null>(null);
   
   const monthOptions = [
     { value: "All", label: "All Months" },
@@ -187,7 +190,13 @@ export default function ReportsPage() {
                     onChange={setDateTo}
                   />
                   <div className="flex items-end">
-                    <button className="w-full px-4 py-2 bg-[#272727] hover:bg-[#1f1f1f] text-[#EFD09E] rounded-lg text-sm font-semibold transition-colors shadow-md shadow-[#272727]/20 border border-[#EFD09E]/20 flex items-center justify-center gap-2">
+                    <button
+                      onClick={() => {
+                        if (!selectedReportType) { alert("กรุณาเลือก Report Type"); return; }
+                        if (!dateFrom || !dateTo) { alert("กรุณาเลือกวันที่เริ่มต้นและสิ้นสุด"); return; }
+                        alert(`Generating ${selectedReportType} report\nFrom: ${dateFrom}\nTo: ${dateTo}\n\n(Feature is under development)`);
+                      }}
+                      className="w-full px-4 py-2 bg-[#272727] hover:bg-[#1f1f1f] text-[#EFD09E] rounded-lg text-sm font-semibold transition-colors shadow-md shadow-[#272727]/20 border border-[#EFD09E]/20 flex items-center justify-center gap-2">
                       <TrendingUp className="w-4 h-4" />
                       Generate Report
                     </button>
@@ -205,7 +214,25 @@ export default function ReportsPage() {
                 primaryButton={{
                   label: "Export All",
                   icon: <Download className="w-4 h-4" />,
-                  onClick: () => console.log("Export all"),
+                  onClick: () => exportToCSV(
+                    filteredData.map(r => ({
+                      id: r.id,
+                      name: r.name,
+                      type: r.type,
+                      lastGenerated: r.lastGenerated,
+                      records: r.records,
+                      status: r.status,
+                    })),
+                    [
+                      { key: "id", header: "ID" },
+                      { key: "name", header: "Report Name" },
+                      { key: "type", header: "Type" },
+                      { key: "lastGenerated", header: "Last Generated" },
+                      { key: "records", header: "Records" },
+                      { key: "status", header: "Status" },
+                    ],
+                    "reports_export"
+                  ),
                 }}
               >
                 <div className="flex gap-4">
@@ -245,11 +272,67 @@ export default function ReportsPage() {
                 columns={columns}
                 data={filteredData}
                 keyField="id"
-                onRowClick={(row) => console.log("View report", row)}
+                onRowClick={(row) => setSelectedReport(row)}
                 emptyMessage="No reports found"
               />
             </div>
           </ModuleHeader>
+
+          {/* Report Details Modal */}
+          <Modal
+            isOpen={!!selectedReport}
+            onClose={() => setSelectedReport(null)}
+            title={`Report Details`}
+            className="md:max-w-lg"
+          >
+            {selectedReport && (
+              <div className="space-y-6">
+                <div className="flex justify-between items-start bg-[#EEF2F6]/80 p-4 rounded-lg border border-white/80">
+                  <div>
+                    <p className="text-xs text-[#7E5C4A] uppercase mb-1">Report Name</p>
+                    <p className="font-bold text-[#272727] text-lg">{selectedReport.name}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-[#7E5C4A] uppercase mb-1">Status</p>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium border ${
+                      selectedReport.status === "Ready" ? "bg-[#9ACD32]/20 text-[#5a7a1a] border-[#9ACD32]/35" :
+                      selectedReport.status === "Generating" ? "bg-[#EEF2F6] text-[#7E5C4A] border-[#D4AA7D]/30 animate-pulse" :
+                      "bg-[#EFD09E]/60 text-[#7E5C4A] border-[#D4AA7D]/35"
+                    }`}>
+                      {selectedReport.status}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-[#7E5C4A] uppercase mb-1">Type</p>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#EFD09E]/70 text-[#272727] border border-[#D4AA7D]/35">
+                      {selectedReport.type}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[#7E5C4A] uppercase mb-1">Records</p>
+                    <p className="font-bold text-[#272727] text-lg">{selectedReport.records.toLocaleString()}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-xs text-[#7E5C4A] uppercase mb-1">Last Generated</p>
+                  <p className="font-medium text-[#272727]">{selectedReport.lastGenerated}</p>
+                </div>
+
+                <div className="pt-4 border-t border-[#D4AA7D]/25">
+                  <button
+                    onClick={() => setSelectedReport(null)}
+                    className="w-full py-2.5 bg-[#272727] hover:bg-[#1f1f1f] text-[#EFD09E] rounded-lg font-medium transition-colors shadow-lg shadow-[#272727]/25 border border-[#EFD09E]/20"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+          </Modal>
         </div>
       </section>
     </div>
