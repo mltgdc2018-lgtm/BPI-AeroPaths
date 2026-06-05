@@ -18,7 +18,8 @@ import {
   Clock,
   Plus,
   Trash2,
-  X
+  X,
+  Upload
 } from "lucide-react";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { ModuleHeader } from "@/components/projects/material-control/ModuleHeader";
@@ -38,7 +39,6 @@ import { buildExpectedQtyMap, validateAdjustedResult } from "@/lib/planning/adju
 import { buildPackingDetailSheetEntries, summarizePoNos } from "@/lib/packing-details/export.helpers";
 import type { PackingDetailsExportOptions } from "@/lib/packing-details/export.types";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { exportToCSV } from "@/lib/utils/csvExport";
 
 interface PlanSummary {
   totalPallets: number;
@@ -120,7 +120,9 @@ export default function PackagingBookingPage() {
   const [customerForm, setCustomerForm] = useState<CustomerFormState>({ code: "", type: "E" });
   const [pendingDeleteCustomerCode, setPendingDeleteCustomerCode] = useState<string | null>(null);
   const [skuDimensions, setSkuDimensions] = useState<Record<string, SkuDimension>>({});
+  const [isImportingCSV, setIsImportingCSV] = useState(false);
   const savePlanInFlightRef = useRef(false);
+  const csvImportFileRef = useRef<HTMLInputElement>(null);
 
   // --- Load History on Mount ---
   useEffect(() => {
@@ -537,34 +539,317 @@ export default function PackagingBookingPage() {
       return;
     }
 
-    const csvData: any[] = [];
-    planResult.forEach((poGroup) => {
-      poGroup.cases.forEach((c) => {
-        c.items.forEach((item) => {
-          csvData.push({
-            po: poGroup.po,
-            caseNo: c.caseNo,
-            sku: item.sku,
-            qty: item.qty,
-            type: c.type,
-            dims: c.dims,
-            note: c.note || "-",
-          });
-        });
-      });
-    });
+    const exportDate = new Date().toLocaleString("th-TH", { timeZone: "Asia/Bangkok" });
+    const poList = planResult.map((p) => p.po).join(", ");
+    const totalCases = planResult.reduce((sum, p) => sum + p.cases.length, 0);
+    const totalItems = planSummary?.totalItems ?? 0;
+    const totalPallets = planSummary?.totalPallets ?? 0;
+    const totalBoxes = planSummary?.totalBoxes ?? 0;
 
-    const columns: { key: keyof typeof csvData[0]; header: string }[] = [
-      { key: "po", header: "PO" },
-      { key: "caseNo", header: "Case No." },
-      { key: "sku", header: "SKU" },
-      { key: "qty", header: "Qty" },
-      { key: "type", header: "Package Type" },
-      { key: "dims", header: "Dimensions" },
-      { key: "note", header: "Note" },
+    // ── Section 1: Metadata Header ────────────────────────────────────────────
+    const metaRows: (string | number)[][] = [
+      ["PACKING PLAN - EDITABLE CSV", "", "", "", "", "", "", "", ""],
+      ["BPI AeroPath Packaging System", "", "", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", "", "", ""],
+      ["Customer:", selectedCustomer.code, "", "Region:", selectedCustomer.region, "", "Export Date:", exportDate, ""],
+      ["POs:", poList, "", "Total Cases:", totalCases, "", "Total Items:", totalItems, ""],
+      ["Total Pallets:", totalPallets, "", "Total Boxes:", totalBoxes, "", "", "", ""],
+      ["", "", "", "", "", "", "", "", ""],
+      ["=== INSTRUCTIONS ===", "", "", "", "", "", "", "", ""],
+      ["Columns marked ✏ are EDITABLE. Modify values in Qty / Note columns then re-upload.", "", "", "", "", "", "", "", ""],
+      ["DO NOT change: PO / Case No. / SKU columns (used as row identifiers).", "", "", "", "", "", "", "", ""],
+      ["DO NOT delete or rename column headers in the DATA section.", "", "", "", "", "", "", "", ""],
+      ["Rows starting with # or blank rows are ignored on import.", "", "", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", "", "", ""],
+      ["=== DATA START ===", "", "", "", "", "", "", "", ""],
     ];
 
-    exportToCSV(csvData, columns, `PlanPack_${selectedCustomer.code}`);
+    // ── Section 2: Edit Data (one row per item) ───────────────────────────────
+    // Headers: columns with ✏ are editable
+    const EDIT_HEADERS = ["PO", "Case No.", "SKU", "✏ Qty", "Package Type", "Dimensions", "✏ Note", "Ref:PO_TotalQty", "Ref:Case_ItemCount"];
+
+    // Pre-calculate totals for reference columns
+    const poTotalQtyMap: Record<string, number> = {};
+    planResult.forEach((poGroup) => {
+      poTotalQtyMap[poGroup.po] = poGroup.cases.reduce(
+        (sum, c) => sum + c.items.reduce((s, i) => s + i.qty, 0),
+        0
+      );
+    });
+
+    const dataRows: (string | number)[][] = [];
+    planResult.forEach((poGroup) => {
+      // PO group separator comment
+      dataRows.push([`# --- PO: ${poGroup.po} (${poGroup.cases.length} cases) ---`, "", "", "", "", "", "", "", ""]);
+      poGroup.cases.forEach((c) => {
+        const caseItemCount = c.items.reduce((s, i) => s + i.qty, 0);
+        c.items.forEach((item) => {
+          dataRows.push([
+            poGroup.po,
+            c.caseNo,
+            item.sku,
+            item.qty,
+            c.type,
+            c.dims,
+            c.note ?? "",
+            poTotalQtyMap[poGroup.po] ?? "",
+            caseItemCount,
+          ]);
+        });
+      });
+      // Blank separator between POs
+      dataRows.push(["", "", "", "", "", "", "", "", ""]);
+    });
+
+    // ── Section 3: Data End Marker ────────────────────────────────────────────
+    dataRows.push(["=== DATA END ===", "", "", "", "", "", "", "", ""]);
+
+    // ── Section 4: Summary per PO (read-only reference) ───────────────────────
+    const summaryRows: (string | number)[][] = [
+      ["", "", "", "", "", "", "", "", ""],
+      ["=== SUMMARY (Read-Only Reference) ===", "", "", "", "", "", "", "", ""],
+      ["PO", "Total Cases", "Total Items", "Pallets", "Boxes", "Wraps", "", "", ""],
+    ];
+    planResult.forEach((poGroup) => {
+      const poTotalItems = poGroup.cases.reduce((sum, c) => sum + c.items.reduce((s, i) => s + i.qty, 0), 0);
+      const poPallets = poGroup.cases.filter((c) => c.type.toLowerCase().includes("pallet")).length;
+      const poBoxes = poGroup.cases.filter((c) => c.type.toLowerCase().includes("box")).length;
+      const poWarps = poGroup.cases.filter((c) => c.type.toLowerCase().includes("warp") || c.type.toLowerCase().includes("wrap")).length;
+      summaryRows.push([poGroup.po, poGroup.cases.length, poTotalItems, poPallets, poBoxes, poWarps, "", "", ""]);
+    });
+
+    // ── Assemble full CSV ─────────────────────────────────────────────────────
+    const escapeCell = (v: string | number): string => {
+      const s = String(v ?? "");
+      if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+        return `"${s.replace(/"/g, '""')}"`;
+      }
+      return s;
+    };
+
+    const allRows: (string | number)[][] = [
+      ...metaRows,
+      EDIT_HEADERS,
+      ...dataRows,
+      ...summaryRows,
+    ];
+
+    const csvContent = allRows.map((row) => row.map(escapeCell).join(",")).join("\n");
+
+    // BOM for Thai character Excel compatibility
+    const BOM = "\uFEFF";
+    const blob = new Blob([BOM + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `PlanPack_${selectedCustomer.code}_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // ── CSV Import: Parse edited CSV and apply changes back to plan ──────────
+  const handleImportCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !planResult.length) return;
+
+    setIsImportingCSV(true);
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result as string;
+        if (!text) throw new Error("Empty file");
+
+        const lines = text.replace(/^\uFEFF/, "").split("\n");
+
+        // Find the header row (contains "PO" and "Case No." and "SKU")
+        let headerIdx = -1;
+        let headers: string[] = [];
+        for (let i = 0; i < lines.length; i++) {
+          const cells = parseCSVLine(lines[i]);
+          const joined = cells.join("||").toLowerCase();
+          if (joined.includes("po") && joined.includes("case no.") && joined.includes("sku")) {
+            headerIdx = i;
+            headers = cells.map((h) => h.trim());
+            break;
+          }
+        }
+
+        if (headerIdx === -1) {
+          alert("CSV format error: Could not find the header row (PO / Case No. / SKU).\nPlease use a CSV exported from this system.");
+          return;
+        }
+
+        // Map header names to indices (support both ✏ prefixed and plain headers)
+        const colIndex = (name: string): number => {
+          return headers.findIndex((h) => {
+            const clean = h.replace(/^✏\s*/, "").replace(/^Ref:/, "").trim().toLowerCase();
+            return clean === name.toLowerCase();
+          });
+        };
+
+        const iCol = {
+          po: colIndex("PO"),
+          caseNo: colIndex("Case No."),
+          sku: colIndex("SKU"),
+          qty: colIndex("Qty"),
+          note: colIndex("Note"),
+        };
+
+        if (iCol.po === -1 || iCol.caseNo === -1 || iCol.sku === -1 || iCol.qty === -1) {
+          alert("CSV format error: Missing required columns (PO, Case No., SKU, Qty).");
+          return;
+        }
+
+        // Parse data rows
+        interface CSVRow {
+          po: string;
+          caseNo: number;
+          sku: string;
+          qty: number;
+          note: string;
+        }
+
+        const parsedRows: CSVRow[] = [];
+        for (let i = headerIdx + 1; i < lines.length; i++) {
+          const raw = lines[i].trim();
+          // Stop at data end marker or summary section
+          if (raw.startsWith("=== DATA END") || raw.startsWith("=== SUMMARY")) break;
+          // Skip blank lines and comments
+          if (!raw || raw.startsWith("#")) continue;
+
+          const cells = parseCSVLine(raw);
+          const po = (cells[iCol.po] ?? "").trim();
+          const caseNoStr = (cells[iCol.caseNo] ?? "").trim();
+          const sku = (cells[iCol.sku] ?? "").trim();
+          const qtyStr = (cells[iCol.qty] ?? "").trim();
+
+          if (!po || !caseNoStr || !sku || !qtyStr) continue;
+
+          const caseNo = Number(caseNoStr);
+          const qty = Number(qtyStr);
+          if (!Number.isFinite(caseNo) || !Number.isFinite(qty) || qty < 0) continue;
+
+          parsedRows.push({
+            po,
+            caseNo,
+            sku,
+            qty: Math.floor(qty),
+            note: iCol.note !== -1 ? (cells[iCol.note] ?? "").trim() : "",
+          });
+        }
+
+        if (parsedRows.length === 0) {
+          alert("No valid data rows found in the CSV file.");
+          return;
+        }
+
+        // Apply changes by comparing with current planResult
+        let changeCount = 0;
+        const cloned = clonePlanResult(planResult);
+
+        parsedRows.forEach((row) => {
+          const poGroup = cloned.find((g) => g.po === row.po);
+          if (!poGroup) return;
+
+          const caseData = poGroup.cases.find((c) => c.caseNo === row.caseNo);
+          if (!caseData) return;
+
+          // Update qty
+          const item = caseData.items.find((it) => it.sku === row.sku);
+          if (item && item.qty !== row.qty) {
+            item.qty = row.qty;
+            changeCount++;
+          }
+
+          // Update note
+          if (row.note !== (caseData.note ?? "")) {
+            caseData.note = row.note || undefined;
+            changeCount++;
+          }
+        });
+
+        if (changeCount === 0) {
+          alert("No changes detected. The CSV data matches the current plan.");
+          return;
+        }
+
+        // Ensure base is stored before applying CSV edits
+        if (!basePlanResult.length) {
+          setBasePlanResult(clonePlanResult(planResult));
+        }
+
+        updateWorkingPlan(cloned);
+        setAdjustmentRecords((prev) => [
+          ...prev,
+          createAdjustmentRecord({
+            type: "update_item_qty",
+            po: "CSV_IMPORT",
+            caseNo: 0,
+            sku: `Bulk CSV Import (${changeCount} changes)`,
+            qty: changeCount,
+          }),
+        ]);
+        setRedoRecords([]);
+        setIsHistoryMode(false);
+        setIsEditMode(false);
+
+        alert(`CSV imported successfully!\n${changeCount} change(s) applied.\n\nPlease review the updated plan in Step 3.`);
+        setActiveStep(3);
+      } catch (err) {
+        console.error("CSV import error:", err);
+        alert("Failed to parse CSV file. Please check the file format.");
+      } finally {
+        setIsImportingCSV(false);
+        // Reset file input so the same file can be re-selected
+        if (csvImportFileRef.current) {
+          csvImportFileRef.current.value = "";
+        }
+      }
+    };
+
+    reader.onerror = () => {
+      alert("Error reading CSV file.");
+      setIsImportingCSV(false);
+    };
+
+    reader.readAsText(file, "utf-8");
+  };
+
+  // ── CSV Line Parser (handles quoted fields with commas/newlines) ─────────
+  const parseCSVLine = (line: string): string[] => {
+    const result: string[] = [];
+    let current = "";
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (inQuotes) {
+        if (ch === '"') {
+          if (i + 1 < line.length && line[i + 1] === '"') {
+            current += '"';
+            i++; // skip escaped quote
+          } else {
+            inQuotes = false;
+          }
+        } else {
+          current += ch;
+        }
+      } else {
+        if (ch === '"') {
+          inQuotes = true;
+        } else if (ch === ",") {
+          result.push(current);
+          current = "";
+        } else {
+          current += ch;
+        }
+      }
+    }
+    result.push(current);
+    return result;
   };
 
   const handleExportPackingDetails = async () => {
@@ -1224,7 +1509,7 @@ export default function PackagingBookingPage() {
                                 </p>
                               ) : null}
                               
-                              <div className="grid grid-cols-2 gap-4 w-full max-w-md mt-4">
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-2xl mt-4">
                                   <button 
                                       onClick={handleSavePlan}
                                       disabled={isSaving || validationResult.errors.length > 0 || (isHistoryMode && adjustmentRecords.length === 0)}
@@ -1279,6 +1564,23 @@ export default function PackagingBookingPage() {
                                       <FileSpreadsheet className="w-8 h-8 text-[#7E5C4A] group-hover:text-[#EFD09E] transition-colors"/>
                                       <span className="font-bold text-[#7E5C4A] group-hover:text-[#EFD09E]">
                                         Download CSV
+                                      </span>
+                                      <span className="text-[10px] text-[#7E5C4A]/60 group-hover:text-[#EFD09E]/60 -mt-1">
+                                        Editable in Excel
+                                      </span>
+                                  </button>
+
+                                  <button 
+                                      onClick={() => csvImportFileRef.current?.click()}
+                                      disabled={isImportingCSV || validationResult.errors.length > 0}
+                                      className="flex flex-col items-center justify-center gap-3 p-6 bg-[#EFD09E]/40 border-2 border-[#D4AA7D]/35 rounded-2xl hover:border-[#272727] hover:bg-[#272727] transition-all group "
+                                  >
+                                      <Upload className="w-8 h-8 text-[#7E5C4A] group-hover:text-[#EFD09E] transition-colors"/>
+                                      <span className="font-bold text-[#7E5C4A] group-hover:text-[#EFD09E]">
+                                        {isImportingCSV ? "Importing..." : "Upload Edited CSV"}
+                                      </span>
+                                      <span className="text-[10px] text-[#7E5C4A]/60 group-hover:text-[#EFD09E]/60 -mt-1">
+                                        Re-import changes
                                       </span>
                                   </button>
                                   
@@ -1687,6 +1989,16 @@ export default function PackagingBookingPage() {
           </div>
         </div>
       )}
+
+      {/* Hidden file input for CSV import */}
+      <input
+        ref={csvImportFileRef}
+        type="file"
+        accept=".csv,.txt"
+        onChange={handleImportCSV}
+        className="hidden"
+        aria-label="Import edited CSV file"
+      />
     </div>
   );
 }
