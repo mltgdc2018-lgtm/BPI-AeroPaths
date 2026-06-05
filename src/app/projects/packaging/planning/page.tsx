@@ -1442,20 +1442,22 @@ export default function PackagingBookingPage() {
                                        {isEditMode ? (
                                          <colgroup>
                                            <col style={{ width: "5%" }} />
+                                           <col style={{ width: "8%" }} />
+                                           <col style={{ width: "12%" }} />
+                                           <col style={{ width: "25%" }} />
+                                           <col style={{ width: "12%" }} />
                                            <col style={{ width: "10%" }} />
-                                           <col style={{ width: "14%" }} />
-                                           <col style={{ width: "29%" }} />
-                                           <col style={{ width: "14%" }} />
                                            <col style={{ width: "18%" }} />
                                            <col style={{ width: "10%" }} />
                                          </colgroup>
                                        ) : (
                                          <colgroup>
+                                           <col style={{ width: "10%" }} />
+                                           <col style={{ width: "14%" }} />
+                                           <col style={{ width: "32%" }} />
+                                           <col style={{ width: "14%" }} />
                                            <col style={{ width: "12%" }} />
-                                           <col style={{ width: "16%" }} />
-                                           <col style={{ width: "34%" }} />
-                                           <col style={{ width: "16%" }} />
-                                           <col style={{ width: "22%" }} />
+                                           <col style={{ width: "18%" }} />
                                          </colgroup>
                                        )}
                                        <thead className="bg-[#D4AA7D] text-xs font-black text-[#272727] uppercase tracking-wider">
@@ -1465,6 +1467,7 @@ export default function PackagingBookingPage() {
                                            <th className="px-4 py-3 text-center">Type</th>
                                            <th className="px-4 py-3 text-center">Contents (SKU / Qty)</th>
                                            <th className="px-4 py-3 text-center">Dimensions</th>
+                                           <th className="px-4 py-3 text-center">Weight</th>
                                            <th className="px-4 py-3 text-center">Note</th>
                                            {isEditMode ? <th className="px-4 py-3 text-center">Actions</th> : null}
                                          </tr>
