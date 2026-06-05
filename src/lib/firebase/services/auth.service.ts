@@ -250,8 +250,10 @@ async function createUserDocument(user: User, displayName?: string) {
 // แปลง Error Code เป็นภาษาอังกฤษ (English)
 function mapAuthError(error: unknown): AuthError {
   const firebaseError = error as { code?: string; message?: string };
-  console.error("Auth Debug - Code:", firebaseError.code);
-  console.error("Auth Debug - Message:", firebaseError.message);
+  // eslint-disable-next-line no-console
+  console.log("Auth Debug - Code:", firebaseError.code);
+  // eslint-disable-next-line no-console
+  console.log("Auth Debug - Message:", firebaseError.message);
   
   let message = "An unexpected error occurred. Please try again.";
   

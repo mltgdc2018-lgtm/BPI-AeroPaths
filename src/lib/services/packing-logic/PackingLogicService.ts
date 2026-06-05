@@ -22,6 +22,8 @@ interface SpecData {
   length: number;
   height: number;
   cbm: number;
+  nw?: number;
+  gw?: number;
   packingRules?: {
     boxes?: Record<string, number>;
     pallets?: Record<string, number>;
@@ -94,6 +96,9 @@ export class PackingLogicService {
 
     // Step 10: Finalize Sorting & Indexing
     this.finalizeAndSort();
+    
+    // Step 11: Calculate Weights
+    this.calculateCaseWeights();
     
     // Generate Summary
     const summary = this.generateSummary();
@@ -202,6 +207,58 @@ export class PackingLogicService {
   }
 
   /**
+   * Step 11: Calculate total weight for each case
+   */
+  private calculateCaseWeights(): void {
+    for (const [po, result] of this.poResults.entries()) {
+      const data = this.poDataMap.get(po);
+      if (!data) continue;
+
+      // Create a quick lookup map for sku -> spec
+      const specMap = new Map<string, ProcessedItem['spec']>();
+      
+      // Look in all sources of data for specs
+      [...data.items, ...data.sameItems, ...data.mixedItems, ...data.remainder].forEach(item => {
+        if (item.spec && !specMap.has(item.sku)) {
+          specMap.set(item.sku, item.spec);
+        }
+      });
+      // Also look through the results if not found
+      [...result.warpCases, ...result.unknownCases, ...result.monoCases, ...result.sameCases, ...result.mixedCases].forEach(c => {
+         c.items.forEach(i => {
+             if (!specMap.has(i.sku)) {
+                 // Try to find it in the original input
+                 // Actually we only have access to what's in specMap. We will do best effort.
+             }
+         });
+      });
+
+      // Calculate weight for a case
+      const calculateForCases = (cases: typeof result.monoCases) => {
+        cases.forEach(c => {
+          let nw = 0;
+          let gw = 0;
+          c.items.forEach(i => {
+            const spec = specMap.get(i.sku);
+            if (spec) {
+              nw += (spec.nw || 0) * i.qty;
+              gw += (spec.gw || 0) * i.qty;
+            }
+          });
+          c.totalNW = Number(nw.toFixed(2));
+          c.totalGW = Number(gw.toFixed(2));
+        });
+      };
+
+      calculateForCases(result.warpCases);
+      calculateForCases(result.unknownCases);
+      calculateForCases(result.monoCases);
+      calculateForCases(result.sameCases);
+      calculateForCases(result.mixedCases);
+    }
+  }
+
+  /**
    * Step 1: Parse raw input (PO, SKU, QTY)
    */
   private parseInput(input: string): ProcessedItem[] {
@@ -294,6 +351,8 @@ export class PackingLogicService {
             length: spec.length,
             height: spec.height,
             m3: spec.cbm,
+            nw: spec.nw,
+            gw: spec.gw,
             packingRules: isValidForRegion || isWarp ? rules : undefined,
           });
 

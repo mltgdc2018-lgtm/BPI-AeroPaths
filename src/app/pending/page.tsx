@@ -635,9 +635,9 @@ export default function PendingPage() {
   const router = useRouter();
   const [isJoinHovered, setIsJoinHovered] = useState(false);
 
-  // Redirect if actually active
+  // Redirect if actually active or in development mode
   useEffect(() => {
-    if (user?.status === "active") {
+    if (user?.status === "active" || process.env.NODE_ENV === "development") {
       router.push("/");
     }
   }, [user, router]);

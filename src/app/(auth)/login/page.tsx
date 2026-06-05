@@ -75,7 +75,7 @@ export default function LoginPage() {
         {error && (
           <div className="mb-6 p-4 bg-red-50/80 backdrop-blur-md border border-red-200/60 rounded-2xl flex items-start gap-3 text-red-700 text-sm animate-shake shadow-[4px_4px_10px_rgba(166,180,200,0.2),-4px_-4px_10px_rgba(255,255,255,0.88)]">
             <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-            <p className="font-bold">Invalid email or password. Please check and try again.</p>
+            <p className="font-bold">{error.message || "Invalid email or password. Please check and try again."}</p>
           </div>
         )}
 

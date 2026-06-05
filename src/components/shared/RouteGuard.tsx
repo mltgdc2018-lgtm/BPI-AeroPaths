@@ -25,8 +25,8 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    if (user.status !== "active") {
-      // Authenticated but not approved → redirect to pending
+    if (user.status !== "active" && process.env.NODE_ENV !== "development") {
+      // Authenticated but not approved → redirect to pending (Bypassed in dev mode)
       router.push("/pending");
       return;
     }
@@ -42,7 +42,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   }
 
   // Not authenticated or not active → show nothing (will redirect)
-  if (!user || user.status !== "active") {
+  if (!user || (user.status !== "active" && process.env.NODE_ENV !== "development")) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />

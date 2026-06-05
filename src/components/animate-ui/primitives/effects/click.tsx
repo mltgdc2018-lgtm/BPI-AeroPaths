@@ -84,7 +84,7 @@ function Click(props: ClickProps): React.ReactElement | null {
       }
       const x = e.clientX;
       const y = e.clientY;
-      const id = crypto.randomUUID();
+      const id = typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : Math.random().toString(36).slice(2);
       const item: Item = {
         id,
         x,

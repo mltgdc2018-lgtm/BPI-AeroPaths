@@ -151,6 +151,23 @@ export function EditableCaseRow({
             caseData.dims
           )}
         </td>
+        <td className="px-4 py-3 text-center text-[11px] font-mono text-[#7E5C4A]">
+          <div className="flex flex-col items-center justify-center space-y-1">
+            {caseData.totalNW !== undefined && (
+              <span className="font-bold text-[#272727] group-hover:text-[#EFD09E] whitespace-nowrap">
+                NW: {caseData.totalNW} kg
+              </span>
+            )}
+            {caseData.totalGW !== undefined && caseData.totalGW > 0 && (
+              <span className="text-[#7E5C4A]/80 group-hover:text-[#EFD09E]/80 whitespace-nowrap">
+                GW: {caseData.totalGW} kg
+              </span>
+            )}
+            {caseData.totalNW === undefined && (
+              <span className="text-[#7E5C4A]/50">-</span>
+            )}
+          </div>
+        </td>
         <td className="px-4 py-3 text-xs text-[#7E5C4A]">
           {isEditMode ? (
             <input

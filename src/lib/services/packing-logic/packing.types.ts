@@ -12,6 +12,8 @@ export interface ProcessedItem {
     length: number;
     height: number;
     m3: number;
+    nw?: number;
+    gw?: number;
     packingRules?: {
       warp?: boolean;
       boxes?: Record<string, number>;
@@ -34,6 +36,8 @@ export interface PackedCase {
   items: { sku: string; name: string; qty: number }[];
   dims: string;
   note?: string;
+  totalNW?: number;
+  totalGW?: number;
 }
 
 export interface POData {
