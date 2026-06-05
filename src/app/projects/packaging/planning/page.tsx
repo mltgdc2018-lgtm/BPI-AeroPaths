@@ -1323,14 +1323,39 @@ export default function PackagingBookingPage() {
                            onDiscard={handleDiscardChanges}
                          />
 
-                         <div className="flex justify-center">
-                            <div className="flex items-center gap-3">
+                         <div className="flex justify-center mt-2 mb-6">
+                            <div className="flex flex-wrap items-center justify-center gap-3">
                               <div className="group h-12 px-4 rounded-xl border border-[#E6E6E6] bg-gradient-to-br from-[#FFFFFF] via-[#F5F5F5] to-[#EBEBEB] text-[#4F4B64] font-bold shadow-[8px_8px_16px_rgba(160,160,160,0.25),-6px_-6px_14px_rgba(255,255,255,0.9)] flex items-center gap-2 transition-all hover:border-[#EFD09E] hover:bg-gradient-to-br hover:from-[#302E41] hover:via-[#272635] hover:to-[#1F1D2B] hover:text-[#EFD09E] hover:shadow-[10px_12px_20px_rgba(39,38,53,0.35)]">
                                 <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-[#9ACD32]/30 text-[#272727] transition-colors group-hover:bg-[#3A374F] group-hover:text-[#EFD09E]">
                                   <CheckCircle2 className="w-4 h-4" />
                                 </span>
                                 Accuracy Rate: <span className="ml-1 text-[#272635] tabular-nums group-hover:text-[#EFD09E]">{accuracyRateText}</span>
                               </div>
+                              
+                              <div className="h-8 w-px bg-[#D4AA7D]/30 mx-1 hidden sm:block"></div>
+                              
+                              <button
+                                onClick={handleDownloadCSV}
+                                disabled={validationResult.errors.length > 0}
+                                className="group h-12 px-4 rounded-xl border border-[#E6E6E6] bg-gradient-to-br from-[#FFFFFF] via-[#F5F5F5] to-[#EBEBEB] text-[#4F4B64] font-bold shadow-[8px_8px_16px_rgba(160,160,160,0.25),-6px_-6px_14px_rgba(255,255,255,0.9)] flex items-center gap-2 transition-all hover:border-[#272727] hover:text-[#EFD09E] hover:bg-gradient-to-br hover:from-[#3A374F] hover:via-[#272727] hover:to-[#1F1D2B] disabled:opacity-40"
+                                title="Download Editable CSV"
+                              >
+                                <FileSpreadsheet className="w-4 h-4 text-[#7E5C4A] group-hover:text-[#EFD09E]" /> 
+                                <span>CSV Export</span>
+                              </button>
+
+                              <button
+                                onClick={() => csvImportFileRef.current?.click()}
+                                disabled={isImportingCSV || validationResult.errors.length > 0}
+                                className="group h-12 px-4 rounded-xl border border-[#E6E6E6] bg-gradient-to-br from-[#FFFFFF] via-[#F5F5F5] to-[#EBEBEB] text-[#4F4B64] font-bold shadow-[8px_8px_16px_rgba(160,160,160,0.25),-6px_-6px_14px_rgba(255,255,255,0.9)] flex items-center gap-2 transition-all hover:border-[#272727] hover:text-[#EFD09E] hover:bg-gradient-to-br hover:from-[#3A374F] hover:via-[#272727] hover:to-[#1F1D2B] disabled:opacity-40"
+                                title="Upload Edited CSV"
+                              >
+                                <Upload className="w-4 h-4 text-[#7E5C4A] group-hover:text-[#EFD09E]" />
+                                <span>{isImportingCSV ? "Importing..." : "CSV Import"}</span>
+                              </button>
+
+                              <div className="h-8 w-px bg-[#D4AA7D]/30 mx-1 hidden sm:block"></div>
+
                               <button
                                 onClick={() => setActiveStep(4)}
                                 disabled={validationResult.errors.length > 0}
