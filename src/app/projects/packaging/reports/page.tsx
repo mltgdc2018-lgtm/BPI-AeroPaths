@@ -1129,17 +1129,18 @@ export default function PackagingReportsPage() {
   const reviewTotals = useMemo(() => calculatePackagingTotals(addForm), [addForm]);
 
   const columns: Column<PackingReportRow>[] = [
-    { key: "date", header: "Date", align: "center" },
+    { key: "date", header: "Date", align: "center", className: "whitespace-nowrap" },
     { key: "shipment", header: "Consignee Name", align: "center" },
-    { key: "mode", header: "Transport Mode", align: "center" },
+    { key: "mode", header: "Transport Mode", align: "center", className: "whitespace-nowrap" },
     { key: "product", header: "Product", align: "center" },
-    { key: "siQty", header: "SI QTY", align: "center" },
-    { key: "qty", header: "Total Product QTY", align: "center" },
-    { key: "totalPackages", header: "Total Pkg", align: "center" },
+    { key: "siQty", header: "SI QTY", align: "center", className: "whitespace-nowrap" },
+    { key: "qty", header: "Total Product QTY", align: "center", className: "whitespace-nowrap" },
+    { key: "totalPackages", header: "Total Pkg", align: "center", className: "whitespace-nowrap" },
     {
       key: "cushionPaperReuse" as keyof PackingReportRow,
       header: "Cushion Paper",
       align: "center",
+      className: "whitespace-nowrap",
       render: (value: unknown) => {
         const num = Number(value) || 0;
         return num > 0 ? `${num.toLocaleString(undefined, { maximumFractionDigits: 2 })} KG` : "-";
