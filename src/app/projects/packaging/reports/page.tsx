@@ -2037,20 +2037,20 @@ export default function PackagingReportsPage() {
                     {ratioAnalysis.cushionTotal > 0 && (
                       <div className={clayChartMiniCardClass}>
                         <p className="text-xs font-black text-[#5D6D7E] transition-all duration-300 group-hover/chart:-translate-y-2">CUSHION PAPER REUSE</p>
-                        <p className="text-3xl font-black text-[#2E7D32] leading-none transition-all duration-300 group-hover/chart:translate-x-0.5">
+                        <p className="text-3xl font-black text-[#34495E] leading-none transition-all duration-300 group-hover/chart:translate-x-0.5">
                           {ratioAnalysis.cushionTotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                           <span className="text-sm font-bold text-[#8C9AAA] ml-1">KG</span>
                         </p>
                         <div className="flex items-center justify-between text-xs font-semibold text-[#5D6D7E] transition-all duration-300 group-hover/chart:translate-y-1">
                           <span>Total Reused</span>
-                          <span className="text-[#2E7D32] font-bold">
+                          <span>
                             {filteredRows.filter((r) => (r.cushionPaperReuse || 0) > 0).length} shipments
                           </span>
                         </div>
                         <div className="h-2 rounded-full bg-[#DFE6EE] overflow-hidden">
-                          <div className="h-full rounded-full bg-[#66BB6A] transition-transform duration-300 origin-left group-hover/chart:scale-x-[1.02] group-hover/mini:scale-x-[1.04]" style={{ width: '100%' }} />
+                          <div className="h-full rounded-full bg-[#E9C46A] transition-transform duration-300 origin-left group-hover/chart:scale-x-[1.02] group-hover/mini:scale-x-[1.04]" style={{ width: '100%' }} />
                         </div>
-                        <p className="text-[11px] italic text-[#8C9AAA] transition-all duration-300 group-hover/chart:translate-y-1">Eco-friendly reuse tracking</p>
+                        <p className="text-[11px] italic text-[#8C9AAA] transition-all duration-300 group-hover/chart:translate-y-1">Based on cushion paper reuse records</p>
                       </div>
                     )}
                   </div>
