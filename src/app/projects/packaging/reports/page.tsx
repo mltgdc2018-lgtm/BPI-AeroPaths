@@ -857,7 +857,8 @@ export default function PackagingReportsPage() {
     const sumSiQty = filteredRows.reduce((sum, row) => sum + row.siQty, 0);
     const sumQty = filteredRows.reduce((sum, row) => sum + row.qty, 0);
     const sumPackages = filteredRows.reduce((sum, row) => sum + row.totalPackages, 0);
-    return { totalRows, sumSiQty, sumQty, sumPackages };
+    const sumCushionPaperReuse = filteredRows.reduce((sum, row) => sum + (row.cushionPaperReuse || 0), 0);
+    return { totalRows, sumSiQty, sumQty, sumPackages, sumCushionPaperReuse };
   }, [filteredRows]);
 
   const packagingUsageTotals = useMemo(
@@ -1058,12 +1059,17 @@ export default function PackagingReportsPage() {
       },
     ].filter((card) => card.packagesUsed > 0);
 
+    // Add Cushion Paper Reuse card if data exists
+    const cushionTotal = filteredRows.reduce((sum, row) => sum + (row.cushionPaperReuse || 0), 0);
+
     const maxUsed = Math.max(...cards.map((card) => card.packagesUsed), 1);
-    return cards.map((card) => ({
+    const ratioCards = cards.map((card) => ({
       ...card,
       barWidth: (card.packagesUsed / maxUsed) * 100,
     }));
-  }, [packageTypeUsage]);
+
+    return { cards: ratioCards, cushionTotal };
+  }, [packageTypeUsage, filteredRows]);
 
   const claySurfaceClass =
     "bg-[#F0F4F8] border border-[#E7EDF5] shadow-[8px_8px_18px_rgba(166,180,200,0.35),-8px_-8px_18px_rgba(255,255,255,0.9)]";
@@ -1130,6 +1136,15 @@ export default function PackagingReportsPage() {
     { key: "siQty", header: "SI QTY", align: "center" },
     { key: "qty", header: "Total Product QTY", align: "center" },
     { key: "totalPackages", header: "Total Pkg", align: "center" },
+    {
+      key: "cushionPaperReuse" as keyof PackingReportRow,
+      header: "Cushion Paper",
+      align: "center",
+      render: (value: unknown) => {
+        const num = Number(value) || 0;
+        return num > 0 ? `${num.toLocaleString(undefined, { maximumFractionDigits: 2 })} KG` : "-";
+      },
+    },
   ];
 
   const activityUser = user?.displayName || user?.email || "System";
@@ -1187,6 +1202,7 @@ export default function PackagingReportsPage() {
       "Ratio Carton",
       "Ratio Wrap",
       "Ratio Returnable",
+      "Cushion Paper Reuse (KG)",
       "Remark",
       ...PACKAGING_BREAKDOWN_FIELDS.map((field) => field.label),
     ];
@@ -1213,6 +1229,7 @@ export default function PackagingReportsPage() {
           row.ratioCarton.toFixed(2),
           row.ratioWarp.toFixed(2),
           row.ratioReturnable.toFixed(2),
+          row.cushionPaperReuse || 0,
           row.remark,
           ...PACKAGING_BREAKDOWN_FIELDS.map(
             (field) => row.packagingBreakdown?.[field.key] ?? 0
@@ -1999,7 +2016,7 @@ export default function PackagingReportsPage() {
                     <h3 className="text-lg font-black text-[#34495E] tracking-tight transition-all duration-300 group-hover/chart:translate-x-0.5">Ratio Analysis (Product Capacity)</h3>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
-                    {ratioAnalysis.map((card) => (
+                    {ratioAnalysis.cards.map((card) => (
                       <div key={card.title} className={clayChartMiniCardClass}>
                         <p className="text-xs font-black text-[#5D6D7E] transition-all duration-300 group-hover/chart:-translate-y-2">{card.title}</p>
                         <p className="text-3xl font-black text-[#34495E] leading-none transition-all duration-300 group-hover/chart:translate-x-0.5">
@@ -2016,6 +2033,25 @@ export default function PackagingReportsPage() {
                         <p className="text-[11px] italic text-[#8C9AAA] transition-all duration-300 group-hover/chart:translate-y-1">Based on defined package ratios</p>
                       </div>
                     ))}
+                    {ratioAnalysis.cushionTotal > 0 && (
+                      <div className={clayChartMiniCardClass}>
+                        <p className="text-xs font-black text-[#5D6D7E] transition-all duration-300 group-hover/chart:-translate-y-2">CUSHION PAPER REUSE</p>
+                        <p className="text-3xl font-black text-[#2E7D32] leading-none transition-all duration-300 group-hover/chart:translate-x-0.5">
+                          {ratioAnalysis.cushionTotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                          <span className="text-sm font-bold text-[#8C9AAA] ml-1">KG</span>
+                        </p>
+                        <div className="flex items-center justify-between text-xs font-semibold text-[#5D6D7E] transition-all duration-300 group-hover/chart:translate-y-1">
+                          <span>Total Reused</span>
+                          <span className="text-[#2E7D32] font-bold">
+                            {filteredRows.filter((r) => (r.cushionPaperReuse || 0) > 0).length} shipments
+                          </span>
+                        </div>
+                        <div className="h-2 rounded-full bg-[#DFE6EE] overflow-hidden">
+                          <div className="h-full rounded-full bg-[#66BB6A] transition-transform duration-300 origin-left group-hover/chart:scale-x-[1.02] group-hover/mini:scale-x-[1.04]" style={{ width: '100%' }} />
+                        </div>
+                        <p className="text-[11px] italic text-[#8C9AAA] transition-all duration-300 group-hover/chart:translate-y-1">Eco-friendly reuse tracking</p>
+                      </div>
+                    )}
                   </div>
                 </GlassCard>
               </div>
