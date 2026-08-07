@@ -52,6 +52,7 @@ interface PackingReportRow {
   ratioWarp: number;
   ratioReturnable: number;
   packagingBreakdown?: Record<PackagingBreakdownKey, number>;
+  cushionPaperReuse?: number;
   remark: string;
 }
 
@@ -80,6 +81,7 @@ interface AddRecordForm {
   qty53x53x19: string;
   warpQty: string;
   unitQty: string;
+  cushionPaperReuse: string;
   remark: string;
 }
 
@@ -286,6 +288,7 @@ const buildInitialAddForm = (date = ""): AddRecordForm => ({
   qty53x53x19: "",
   warpQty: "",
   unitQty: "",
+  cushionPaperReuse: "",
   remark: "",
 });
 
@@ -403,6 +406,7 @@ const mapRowToAddForm = (row: PackingReportRow): AddRecordForm => {
     qty53x53x19: String(breakdown?.qty53x53x19 ?? ""),
     warpQty: String(breakdown?.warpQty ?? ""),
     unitQty: String(breakdown?.unitQty ?? ""),
+    cushionPaperReuse: String(row.cushionPaperReuse ?? ""),
     remark: row.remark || "",
   };
 };
@@ -453,6 +457,7 @@ const mapAnyToPackingReportRow = (id: string, source: unknown): PackingReportRow
     ratioWarp: Number(data.ratioWarp) || warpTotal / 10,
     ratioReturnable: Number(data.ratioReturnable) || returnableTotal / 2,
     packagingBreakdown,
+    cushionPaperReuse: Number(data.cushionPaperReuse) || 0,
     remark: data.remark || "",
   };
 };
@@ -479,6 +484,7 @@ const toFirestoreReportPayload = (row: PackingReportRow) => ({
   ratioWarp: row.ratioWarp,
   ratioReturnable: row.ratioReturnable,
   packagingBreakdown: normalizePackagingBreakdown(row.packagingBreakdown),
+  cushionPaperReuse: row.cushionPaperReuse || 0,
   remark: row.remark,
 });
 
@@ -1455,6 +1461,7 @@ export default function PackagingReportsPage() {
       ratioWarp,
       ratioReturnable,
       packagingBreakdown,
+      cushionPaperReuse: parseNumberInput(addForm.cushionPaperReuse),
       remark: addForm.remark.trim(),
     };
 
@@ -2202,6 +2209,25 @@ export default function PackagingReportsPage() {
                         );
                       })()
                     ))}
+                    <div>
+                      <label className="block text-[11px] font-bold text-[#7E5C4A] mb-1">Cushion Paper Reuse</label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={addForm.cushionPaperReuse}
+                          onChange={(event) =>
+                            setAddForm((prev) => ({ ...prev, cushionPaperReuse: event.target.value }))
+                          }
+                          placeholder="0.00"
+                          className="w-full pl-3 pr-12 py-2 rounded-lg border border-[#D4AA7D]/35 bg-white/85 text-sm text-right outline-none focus:ring-2 focus:ring-[#D4AA7D]/35"
+                        />
+                        <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[11px] font-bold text-[#7E5C4A]/75">
+                          KG
+                        </span>
+                      </div>
+                    </div>
                     <div className="md:col-span-2">
                       <label className="block text-[11px] font-bold text-[#7E5C4A] mb-1">Remark</label>
                       <textarea
@@ -2330,6 +2356,7 @@ export default function PackagingReportsPage() {
                       { label: "Transport Mode", value: addForm.transportMode || "-", compact: false },
                       { label: "SI QTY", value: addForm.siQty || "-", compact: true },
                       { label: "Total Product QTY", value: addForm.totalProductQty || "-", compact: true },
+                      { label: "Cushion Paper Reuse", value: addForm.cushionPaperReuse ? `${addForm.cushionPaperReuse} KG` : "-", compact: true },
                       { label: "Remark", value: addForm.remark || "-", compact: false },
                     ].map((field) => (
                       <div
